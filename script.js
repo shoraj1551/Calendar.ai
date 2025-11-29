@@ -12,6 +12,15 @@ const yearsList = document.querySelector(".years-list");
 const monthsList = document.querySelector(".months-list");
 const hoursList = document.querySelector(".hours-list");
 
+// Modal Elements
+const eventModal = document.querySelector("#event-modal");
+const closeBtn = document.querySelector(".close-btn");
+const eventTitleInput = document.querySelector("#event-title");
+const eventAgendaInput = document.querySelector("#event-agenda");
+const eventTimeInput = document.querySelector("#event-time");
+const saveEventBtn = document.querySelector("#save-event");
+const deleteEventBtn = document.querySelector("#delete-event");
+
 // State
 let date = new Date();
 let currYear = date.getFullYear();
@@ -19,11 +28,24 @@ let currMonth = date.getMonth();
 let currDay = date.getDate();
 let currentView = 'month'; // 'decade', 'year', 'month', 'day'
 
+// Events State: { "YYYY-MM-DD": [ { title: "Meeting", agenda: "...", time: "10:00" } ] }
+let eventsObj = JSON.parse(localStorage.getItem("calendar-events") || "{}");
+let selectedEvent = null; // For editing/deleting
+
 // Decade view range start (e.g., 2020 for 2020-2029)
 let decadeStart = Math.floor(currYear / 12) * 12;
 
 const months = ["January", "February", "March", "April", "May", "June", "July",
     "August", "September", "October", "November", "December"];
+
+// --- Helper Functions ---
+const getEventKey = (year, month, day) => {
+    return `${year}-${month + 1}-${day}`;
+}
+
+const saveEvents = () => {
+    localStorage.setItem("calendar-events", JSON.stringify(eventsObj));
+}
 
 // --- View Rendering Functions ---
 
@@ -87,7 +109,13 @@ const renderMonthView = () => {
     for (let i = 1; i <= lastDateofMonth; i++) {
         let isToday = i === date.getDate() && currMonth === new Date().getMonth()
             && currYear === new Date().getFullYear() ? "active" : "";
-        liTag += `<li class="${isToday}" onclick="selectDay(${i})">${i}</li>`;
+
+        // Check for events
+        let eventKey = getEventKey(currYear, currMonth, i);
+        let hasEvent = eventsObj[eventKey] && eventsObj[eventKey].length > 0;
+        let eventDot = hasEvent ? `<div class="event-dot"></div>` : "";
+
+        liTag += `<li class="${isToday}" onclick="selectDay(${i})">${i}${eventDot}</li>`;
     }
 
     for (let i = lastDayofMonth; i < 6; i++) {
@@ -107,16 +135,98 @@ const renderDayView = () => {
 
     currentDate.innerText = `${currDay} ${months[currMonth]} ${currYear}`;
 
+    let eventKey = getEventKey(currYear, currMonth, currDay);
+    let dayEvents = eventsObj[eventKey] || [];
+
     let liTag = "";
     for (let i = 0; i < 24; i++) {
         let hour = i < 10 ? `0${i}:00` : `${i}:00`;
-        liTag += `<li>
+
+        // Find event for this hour
+        let eventForHour = dayEvents.find(e => e.time.startsWith(hour.substring(0, 2)));
+
+        let eventContent = "No events";
+        let onClickAction = `openModal('${hour}')`;
+
+        if (eventForHour) {
+            // Escape quotes for the onclick attribute
+            const safeTitle = eventForHour.title.replace(/'/g, "\\'");
+            const safeAgenda = (eventForHour.agenda || "").replace(/'/g, "\\'").replace(/\n/g, " ");
+            eventContent = `<span class="event-block"><strong>${eventForHour.title}</strong><br><span style="font-size:0.8em; opacity:0.8;">${eventForHour.agenda || ''}</span></span>`;
+            onClickAction = `openModal('${hour}', '${safeTitle}', '${safeAgenda}')`;
+        }
+
+        liTag += `<li onclick="${onClickAction}">
                     <span class="time-slot">${hour}</span>
-                    <span class="event-slot">No events</span>
+                    <span class="event-slot">${eventContent}</span>
                   </li>`;
     }
     hoursList.innerHTML = liTag;
 }
+
+// --- Modal Functions ---
+
+window.openModal = (time, title = null, agenda = null) => {
+    selectedEvent = title ? { time, title, agenda } : null;
+    eventTimeInput.value = time;
+    eventTitleInput.value = title || "";
+    eventAgendaInput.value = agenda || "";
+    deleteEventBtn.style.display = title ? "block" : "none";
+    eventModal.style.display = "flex";
+}
+
+const closeModal = () => {
+    eventModal.style.display = "none";
+    selectedEvent = null;
+    eventTitleInput.value = "";
+    eventAgendaInput.value = "";
+    eventTimeInput.value = "";
+}
+
+closeBtn.addEventListener("click", closeModal);
+
+saveEventBtn.addEventListener("click", () => {
+    const title = eventTitleInput.value;
+    const agenda = eventAgendaInput.value;
+    const time = eventTimeInput.value;
+
+    if (title && time) {
+        const eventKey = getEventKey(currYear, currMonth, currDay);
+        if (!eventsObj[eventKey]) {
+            eventsObj[eventKey] = [];
+        }
+
+        // If editing, remove old event first
+        if (selectedEvent) {
+            eventsObj[eventKey] = eventsObj[eventKey].filter(e => e.time !== selectedEvent.time);
+        }
+
+        // Add new event
+        eventsObj[eventKey].push({ title, agenda, time });
+        saveEvents();
+        closeModal();
+        renderDayView();
+    }
+});
+
+deleteEventBtn.addEventListener("click", () => {
+    if (selectedEvent) {
+        const eventKey = getEventKey(currYear, currMonth, currDay);
+        if (eventsObj[eventKey]) {
+            eventsObj[eventKey] = eventsObj[eventKey].filter(e => e.time !== selectedEvent.time);
+            saveEvents();
+        }
+        closeModal();
+        renderDayView();
+    }
+});
+
+// Close modal if clicking outside
+window.addEventListener("click", (e) => {
+    if (e.target === eventModal) {
+        closeModal();
+    }
+});
 
 // --- Navigation Actions ---
 

@@ -13,7 +13,6 @@ body {
     align-items: center;
     justify-content: center;
     min-height: 100vh;
-    background: #f0f2f5;
     background: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%);
     padding: 20px;
 }
@@ -264,4 +263,124 @@ body {
     padding-left: 10px;
     color: #999;
     font-style: italic;
+}
+
+/* --- Event Modal Styles --- */
+.event-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: #fff;
+    padding: 25px;
+    border-radius: 16px;
+    width: 350px;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+    position: relative;
+}
+
+.modal-content h3 {
+    margin-bottom: 20px;
+    color: #333;
+    font-size: 1.5rem;
+}
+
+.close-btn {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #878787;
+}
+
+.close-btn:hover {
+    color: #333;
+}
+
+.input-group {
+    margin-bottom: 15px;
+}
+
+.input-group input,
+.input-group textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 1rem;
+    outline: none;
+    font-family: 'Outfit', sans-serif;
+    resize: vertical;
+}
+
+.input-group input:focus,
+.input-group textarea:focus {
+    border-color: #9b59b6;
+}
+
+.modal-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.modal-buttons button {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 500;
+    transition: background 0.2s;
+    font-family: 'Outfit', sans-serif;
+}
+
+#save-event {
+    background: #9b59b6;
+    color: #fff;
+}
+
+#save-event:hover {
+    background: #8e44ad;
+}
+
+#delete-event {
+    color: #fff;
+}
+
+#delete-event:hover {
+    opacity: 0.9;
+}
+
+/* --- Event Indicators --- */
+.event-dot {
+    height: 6px;
+    width: 6px;
+    background: #9b59b6;
+    border-radius: 50%;
+    position: absolute;
+    bottom: 5px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.day-view .event-block {
+    background: #e0c3fc;
+    color: #5e3370;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    margin-left: 10px;
 }

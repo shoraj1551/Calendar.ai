@@ -55,6 +55,28 @@
             </div>
         </div>
     </div>
+
+    <!-- Event Modal -->
+    <div class="event-modal" id="event-modal">
+        <div class="modal-content">
+            <span class="close-btn">&times;</span>
+            <h3>Add Event</h3>
+            <div class="input-group">
+                <input type="text" id="event-title" placeholder="Subject">
+            </div>
+            <div class="input-group">
+                <textarea id="event-agenda" placeholder="Agenda" rows="3"></textarea>
+            </div>
+            <div class="input-group">
+                <input type="time" id="event-time">
+            </div>
+            <div class="modal-buttons">
+                <button id="save-event">Save</button>
+                <button id="delete-event" style="display: none; background-color: #ff4d4d;">Delete</button>
+            </div>
+        </div>
+    </div>
+
     <script src="script.js" defer></script>
 </body>
 
