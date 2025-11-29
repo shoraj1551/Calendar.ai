@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendar.ai</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="calendar-container">
+        <header class="calendar-header">
+            <div class="header-left">
+                <span id="back-btn" class="material-symbols-rounded" style="display: none;">arrow_back</span>
+                <p class="current-date"></p>
+            </div>
+            <div class="icons">
+                <span id="prev" class="material-symbols-rounded">&lt;</span>
+                <span id="next" class="material-symbols-rounded">&gt;</span>
+            </div>
+        </header>
+
+        <div class="calendar-body">
+            <!-- Decade View -->
+            <div class="decade-view" style="display: none;">
+                <ul class="years-list"></ul>
+            </div>
+
+            <!-- Year View -->
+            <div class="year-view" style="display: none;">
+                <ul class="months-list"></ul>
+            </div>
+
+            <!-- Month View -->
+            <div class="month-view">
+                <ul class="weeks">
+                    <li>Sun</li>
+                    <li>Mon</li>
+                    <li>Tue</li>
+                    <li>Wed</li>
+                    <li>Thu</li>
+                    <li>Fri</li>
+                    <li>Sat</li>
+                </ul>
+                <ul class="days"></ul>
+            </div>
+
+            <!-- Day View -->
+            <div class="day-view" style="display: none;">
+                <ul class="hours-list"></ul>
+            </div>
+        </div>
+    </div>
+    <script src="script.js" defer></script>
+</body>
+
+</html>

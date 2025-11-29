@@ -1,0 +1,267 @@
+/* Import Google Font - Outfit */
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Outfit', sans-serif;
+}
+
+body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background: #f0f2f5;
+    background: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%);
+    padding: 20px;
+}
+
+.calendar-container {
+    background: #fff;
+    width: 95%;
+    max-width: 1200px;
+    height: 90vh;
+    border-radius: 16px;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12);
+    padding: 20px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.calendar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 20px 20px;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+#back-btn {
+    cursor: pointer;
+    font-size: 1.5rem;
+    color: #878787;
+    user-select: none;
+    transition: color 0.2s;
+}
+
+#back-btn:hover {
+    color: #333;
+}
+
+.calendar-header .current-date {
+    font-size: 1.45rem;
+    font-weight: 600;
+    color: #333;
+    cursor: pointer;
+}
+
+.calendar-header .current-date:hover {
+    color: #9b59b6;
+}
+
+.calendar-header .icons {
+    display: flex;
+}
+
+.calendar-header .icons span {
+    height: 38px;
+    width: 38px;
+    margin: 0 1px;
+    cursor: pointer;
+    color: #878787;
+    text-align: center;
+    line-height: 38px;
+    font-size: 1.9rem;
+    user-select: none;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+}
+
+.calendar-header .icons span:hover {
+    background: #f2f2f2;
+    color: #333;
+}
+
+.calendar-body {
+    flex-grow: 1;
+    overflow-y: auto;
+}
+
+/* --- Decade View Styles --- */
+.decade-view {
+    padding: 20px 10px;
+    height: 100%;
+}
+
+.years-list {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    list-style: none;
+    height: 100%;
+    align-content: center;
+}
+
+.years-list li {
+    cursor: pointer;
+    padding: 30px 0;
+    text-align: center;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 1.2rem;
+    transition: background 0.2s, transform 0.2s;
+    background: #f9f9f9;
+}
+
+.years-list li:hover {
+    background: #f2f2f2;
+    transform: scale(1.05);
+}
+
+.years-list li.active {
+    background: #9b59b6;
+    color: #fff;
+}
+
+/* --- Year View Styles --- */
+.year-view {
+    padding: 20px 10px;
+    height: 100%;
+}
+
+.months-list {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    list-style: none;
+    height: 100%;
+    align-content: center;
+}
+
+.months-list li {
+    cursor: pointer;
+    padding: 40px 0;
+    text-align: center;
+    border-radius: 12px;
+    font-weight: 500;
+    font-size: 1.1rem;
+    transition: background 0.2s;
+    background: #f9f9f9;
+}
+
+.months-list li:hover {
+    background: #f2f2f2;
+}
+
+.months-list li.active {
+    background: #9b59b6;
+    color: #fff;
+}
+
+/* --- Month View Styles --- */
+.month-view {
+    padding: 10px;
+}
+
+.month-view ul {
+    display: flex;
+    flex-wrap: wrap;
+    list-style: none;
+    text-align: center;
+}
+
+.month-view .weeks {
+    margin-bottom: 20px;
+}
+
+.month-view .weeks li {
+    color: #333;
+    width: calc(100% / 7);
+    font-weight: 500;
+}
+
+.month-view .days {
+    margin-bottom: 20px;
+}
+
+.month-view .days li {
+    z-index: 1;
+    cursor: pointer;
+    position: relative;
+    width: calc(100% / 7);
+    margin-top: 30px;
+}
+
+.month-view .days li.inactive {
+    color: #aaa;
+}
+
+.month-view .days li.active {
+    color: #fff;
+}
+
+.month-view .days li::before {
+    position: absolute;
+    content: "";
+    left: 50%;
+    top: 50%;
+    height: 40px;
+    width: 40px;
+    z-index: -1;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.month-view .days li.active::before {
+    background: #9b59b6;
+}
+
+.month-view .days li:not(.active):hover::before {
+    background: #f2f2f2;
+}
+
+/* --- Day View Styles --- */
+.day-view {
+    padding: 10px;
+    max-height: 100%;
+    overflow-y: auto;
+}
+
+.hours-list {
+    list-style: none;
+}
+
+.hours-list li {
+    display: flex;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid #eee;
+    font-size: 0.9rem;
+    color: #555;
+    cursor: pointer;
+}
+
+.hours-list li:hover {
+    background: #fafafa;
+}
+
+.hours-list li .time-slot {
+    width: 60px;
+    font-weight: 600;
+    color: #333;
+}
+
+.hours-list li .event-slot {
+    flex-grow: 1;
+    padding-left: 10px;
+    color: #999;
+    font-style: italic;
+}
