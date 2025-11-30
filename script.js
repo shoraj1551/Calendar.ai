@@ -12,12 +12,28 @@ const yearsList = document.querySelector(".years-list");
 const monthsList = document.querySelector(".months-list");
 const hoursList = document.querySelector(".hours-list");
 
+// Theme Selector
+const themeSelector = document.querySelector("#theme-selector");
+
+// Load saved theme
+const savedTheme = localStorage.getItem("calendar-theme") || "theme-light";
+document.body.className = savedTheme;
+themeSelector.value = savedTheme;
+
+themeSelector.addEventListener("change", (e) => {
+    const selectedTheme = e.target.value;
+    document.body.className = selectedTheme;
+    localStorage.setItem("calendar-theme", selectedTheme);
+});
+
 // Modal Elements
 const eventModal = document.querySelector("#event-modal");
 const closeBtn = document.querySelector(".close-btn");
 const eventTitleInput = document.querySelector("#event-title");
 const eventAgendaInput = document.querySelector("#event-agenda");
 const eventTimeInput = document.querySelector("#event-time");
+const eventDurationInput = document.querySelector("#event-duration");
+const endTimeDisplay = document.querySelector("#end-time-display");
 const saveEventBtn = document.querySelector("#save-event");
 const deleteEventBtn = document.querySelector("#delete-event");
 
@@ -46,6 +62,29 @@ const getEventKey = (year, month, day) => {
 const saveEvents = () => {
     localStorage.setItem("calendar-events", JSON.stringify(eventsObj));
 }
+
+const calculateEndTime = (startTime, durationMinutes) => {
+    const [hours, minutes] = startTime.split(':').map(Number);
+    const date = new Date();
+    date.setHours(hours, minutes);
+    date.setMinutes(date.getMinutes() + parseInt(durationMinutes));
+
+    const endHours = String(date.getHours()).padStart(2, '0');
+    const endMinutes = String(date.getMinutes()).padStart(2, '0');
+    return `${endHours}:${endMinutes}`;
+}
+
+const updateEndTimeDisplay = () => {
+    if (eventTimeInput.value && eventDurationInput.value) {
+        const endTime = calculateEndTime(eventTimeInput.value, eventDurationInput.value);
+        endTimeDisplay.innerText = `End Time: ${endTime}`;
+    } else {
+        endTimeDisplay.innerText = "End Time: --:--";
+    }
+}
+
+eventTimeInput.addEventListener("change", updateEndTimeDisplay);
+eventDurationInput.addEventListener("input", updateEndTimeDisplay);
 
 // --- View Rendering Functions ---
 
@@ -142,22 +181,41 @@ const renderDayView = () => {
     for (let i = 0; i < 24; i++) {
         let hour = i < 10 ? `0${i}:00` : `${i}:00`;
 
-        // Find event for this hour
-        let eventForHour = dayEvents.find(e => e.time.startsWith(hour.substring(0, 2)));
+        // Find events for this hour
+        let eventsForHour = dayEvents.filter(e => {
+            const [eventHour] = e.time.split(':').map(Number);
+            return eventHour === i;
+        });
 
-        let eventContent = "No events";
+        let eventContent = "";
         let onClickAction = `openModal('${hour}')`;
 
-        if (eventForHour) {
-            // Escape quotes for the onclick attribute
-            const safeTitle = eventForHour.title.replace(/'/g, "\\'");
-            const safeAgenda = (eventForHour.agenda || "").replace(/'/g, "\\'").replace(/\n/g, " ");
-            eventContent = `<span class="event-block"><strong>${eventForHour.title}</strong><br><span style="font-size:0.8em; opacity:0.8;">${eventForHour.agenda || ''}</span></span>`;
-            onClickAction = `openModal('${hour}', '${safeTitle}', '${safeAgenda}')`;
+        if (eventsForHour.length > 0) {
+            eventContent = `<div style="display: flex; gap: 5px; overflow-x: auto;">`;
+            eventsForHour.forEach(event => {
+                const safeTitle = event.title.replace(/'/g, "\\'");
+                const safeAgenda = (event.agenda || "").replace(/'/g, "\\'").replace(/\n/g, " ");
+                const duration = event.duration || 60;
+                const endTime = calculateEndTime(event.time, duration);
+
+                // Calculate height based on duration (approx 1px per minute, min 40px)
+                const height = Math.max(40, duration * 0.8);
+
+                eventContent += `<div class="event-block" 
+                                    onclick="event.stopPropagation(); openModal('${event.time}', '${safeTitle}', '${safeAgenda}', ${duration})"
+                                    style="flex: 1; min-width: 100px; height: ${height}px; overflow: hidden;">
+                                    <strong>${event.time} - ${endTime}</strong><br>
+                                    <strong>${event.title}</strong><br>
+                                    <span style="font-size:0.8em; opacity:0.8;">${event.agenda || ''}</span>
+                                 </div>`;
+            });
+            eventContent += `</div>`;
+        } else {
+            eventContent = "No events";
         }
 
-        liTag += `<li onclick="${onClickAction}">
-                    <span class="time-slot">${hour}</span>
+        liTag += `<li onclick="${onClickAction}" style="align-items: flex-start;">
+                    <span class="time-slot" style="margin-top: 10px;">${hour}</span>
                     <span class="event-slot">${eventContent}</span>
                   </li>`;
     }
@@ -166,11 +224,13 @@ const renderDayView = () => {
 
 // --- Modal Functions ---
 
-window.openModal = (time, title = null, agenda = null) => {
-    selectedEvent = title ? { time, title, agenda } : null;
+window.openModal = (time, title = null, agenda = null, duration = 60) => {
+    selectedEvent = title ? { time, title, agenda, duration } : null;
     eventTimeInput.value = time;
     eventTitleInput.value = title || "";
     eventAgendaInput.value = agenda || "";
+    eventDurationInput.value = duration;
+    updateEndTimeDisplay();
     deleteEventBtn.style.display = title ? "block" : "none";
     eventModal.style.display = "flex";
 }
@@ -181,6 +241,8 @@ const closeModal = () => {
     eventTitleInput.value = "";
     eventAgendaInput.value = "";
     eventTimeInput.value = "";
+    eventDurationInput.value = "60";
+    endTimeDisplay.innerText = "End Time: --:--";
 }
 
 closeBtn.addEventListener("click", closeModal);
@@ -189,6 +251,7 @@ saveEventBtn.addEventListener("click", () => {
     const title = eventTitleInput.value;
     const agenda = eventAgendaInput.value;
     const time = eventTimeInput.value;
+    const duration = parseInt(eventDurationInput.value) || 60;
 
     if (title && time) {
         const eventKey = getEventKey(currYear, currMonth, currDay);
@@ -198,11 +261,15 @@ saveEventBtn.addEventListener("click", () => {
 
         // If editing, remove old event first
         if (selectedEvent) {
-            eventsObj[eventKey] = eventsObj[eventKey].filter(e => e.time !== selectedEvent.time);
+            eventsObj[eventKey] = eventsObj[eventKey].filter(e => e.time !== selectedEvent.time || e.title !== selectedEvent.title);
         }
 
         // Add new event
-        eventsObj[eventKey].push({ title, agenda, time });
+        eventsObj[eventKey].push({ title, agenda, time, duration });
+
+        // Sort events by time
+        eventsObj[eventKey].sort((a, b) => a.time.localeCompare(b.time));
+
         saveEvents();
         closeModal();
         renderDayView();

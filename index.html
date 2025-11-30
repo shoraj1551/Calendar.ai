@@ -8,19 +8,27 @@
     <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200">
 </head>
 
-<body>
-    <div class="calendar-container">
-        <header class="calendar-header">
+<body class="theme-light">
+    <div class="wrapper">
+        <header>
             <div class="header-left">
+                <select id="theme-selector"
+                    style="padding: 5px; border-radius: 5px; border: 1px solid #ccc; margin-right: 10px;">
+                    <option value="theme-light">Light</option>
+                    <option value="theme-dark">Dark</option>
+                    <option value="theme-gradient">Gradient</option>
+                    <option value="theme-minimal">Minimal</option>
+                </select>
                 <span id="back-btn" class="material-symbols-rounded" style="display: none;">arrow_back</span>
                 <p class="current-date"></p>
             </div>
             <div class="icons">
-                <span id="prev" class="material-symbols-rounded">&lt;</span>
-                <span id="next" class="material-symbols-rounded">&gt;</span>
+                <span id="prev" class="material-symbols-rounded">chevron_left</span>
+                <span id="next" class="material-symbols-rounded">chevron_right</span>
             </div>
         </header>
 
@@ -67,8 +75,20 @@
             <div class="input-group">
                 <textarea id="event-agenda" placeholder="Agenda" rows="3"></textarea>
             </div>
+            <div class="input-group" style="display: flex; gap: 10px;">
+                <div style="flex: 1;">
+                    <label style="font-size: 0.8rem; color: #878787; display: block; margin-bottom: 5px;">Start
+                        Time</label>
+                    <input type="time" id="event-time" step="60">
+                </div>
+                <div style="flex: 1;">
+                    <label style="font-size: 0.8rem; color: #878787; display: block; margin-bottom: 5px;">Duration
+                        (min)</label>
+                    <input type="number" id="event-duration" min="5" step="5" value="60">
+                </div>
+            </div>
             <div class="input-group">
-                <input type="time" id="event-time">
+                <p id="end-time-display" style="font-size: 0.9rem; color: #878787; margin-top: 5px;">End Time: --:--</p>
             </div>
             <div class="modal-buttons">
                 <button id="save-event">Save</button>

@@ -1,6 +1,64 @@
 /* Import Google Font - Outfit */
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&display=swap');
 
+:root {
+    /* Light Theme (Default) */
+    --body-bg: #f5f7fa;
+    --container-bg: #ffffff;
+    --text-color: #333333;
+    --text-muted: #878787;
+    --border-color: #e6e6e6;
+    --accent-color: #7b2cbf;
+    /* Purple */
+    --accent-hover: #9d4edd;
+    --hover-bg: #f2f2f2;
+    --shadow: 0 15px 40px rgba(0, 0, 0, 0.12);
+    --input-bg: #f9f9f9;
+    --input-border: #ddd;
+}
+
+.theme-dark {
+    --body-bg: #1a1a1a;
+    --container-bg: #2d2d2d;
+    --text-color: #e0e0e0;
+    --text-muted: #a0a0a0;
+    --border-color: #404040;
+    --accent-color: #9d4edd;
+    --accent-hover: #b16ce6;
+    --hover-bg: #3d3d3d;
+    --shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+    --input-bg: #3d3d3d;
+    --input-border: #505050;
+}
+
+.theme-gradient {
+    --body-bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --container-bg: rgba(255, 255, 255, 0.95);
+    --text-color: #333333;
+    --text-muted: #666666;
+    --border-color: #e0e0e0;
+    --accent-color: #764ba2;
+    --accent-hover: #8e5db5;
+    --hover-bg: #f0f0f0;
+    --shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+    --input-bg: #ffffff;
+    --input-border: #d0d0d0;
+}
+
+.theme-minimal {
+    --body-bg: #ffffff;
+    --container-bg: #ffffff;
+    --text-color: #000000;
+    --text-muted: #999999;
+    --border-color: #eeeeee;
+    --accent-color: #000000;
+    --accent-hover: #333333;
+    --hover-bg: #fafafa;
+    --shadow: none;
+    --input-bg: #fafafa;
+    --input-border: #eeeeee;
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -13,69 +71,69 @@ body {
     align-items: center;
     justify-content: center;
     min-height: 100vh;
-    background: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%);
-    padding: 20px;
+    background: var(--body-bg);
+    transition: background 0.3s;
 }
 
-.calendar-container {
-    background: #fff;
+.wrapper {
     width: 95%;
-    max-width: 1200px;
     height: 90vh;
-    border-radius: 16px;
-    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12);
-    padding: 20px;
-    overflow: hidden;
+    background: var(--container-bg);
+    border-radius: 20px;
+    box-shadow: var(--shadow);
     display: flex;
     flex-direction: column;
+    overflow: hidden;
+    transition: background 0.3s, box-shadow 0.3s;
 }
 
-.calendar-header {
+header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 10px 20px 20px;
+    padding: 20px 30px;
+    border-bottom: 1px solid var(--border-color);
 }
 
 .header-left {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 15px;
 }
 
 #back-btn {
     cursor: pointer;
     font-size: 1.5rem;
-    color: #878787;
+    color: var(--text-muted);
     user-select: none;
     transition: color 0.2s;
 }
 
 #back-btn:hover {
-    color: #333;
+    color: var(--text-color);
 }
 
 .calendar-header .current-date {
-    font-size: 1.45rem;
+    font-size: 1.5rem;
     font-weight: 600;
-    color: #333;
+    color: var(--text-color);
     cursor: pointer;
 }
 
 .calendar-header .current-date:hover {
-    color: #9b59b6;
+    color: var(--accent-color);
 }
 
 .calendar-header .icons {
     display: flex;
+    gap: 10px;
 }
 
 .calendar-header .icons span {
     height: 38px;
     width: 38px;
-    margin: 0 1px;
     cursor: pointer;
-    color: #878787;
+    color: var(--text-muted);
     text-align: center;
     line-height: 38px;
     font-size: 1.9rem;
@@ -85,18 +143,20 @@ body {
 }
 
 .calendar-header .icons span:hover {
-    background: #f2f2f2;
-    color: #333;
+    background: var(--hover-bg);
+    color: var(--text-color);
 }
 
 .calendar-body {
     flex-grow: 1;
     overflow-y: auto;
+    padding: 0;
+    /* Remove padding to allow grid to touch edges */
 }
 
 /* --- Decade View Styles --- */
 .decade-view {
-    padding: 20px 10px;
+    padding: 20px;
     height: 100%;
 }
 
@@ -117,22 +177,23 @@ body {
     font-weight: 600;
     font-size: 1.2rem;
     transition: background 0.2s, transform 0.2s;
-    background: #f9f9f9;
+    background: var(--hover-bg);
+    color: var(--text-color);
 }
 
 .years-list li:hover {
-    background: #f2f2f2;
+    background: var(--border-color);
     transform: scale(1.05);
 }
 
 .years-list li.active {
-    background: #9b59b6;
+    background: var(--accent-color);
     color: #fff;
 }
 
 /* --- Year View Styles --- */
 .year-view {
-    padding: 20px 10px;
+    padding: 20px;
     height: 100%;
 }
 
@@ -153,21 +214,23 @@ body {
     font-weight: 500;
     font-size: 1.1rem;
     transition: background 0.2s;
-    background: #f9f9f9;
+    background: var(--hover-bg);
+    color: var(--text-color);
 }
 
 .months-list li:hover {
-    background: #f2f2f2;
+    background: var(--border-color);
 }
 
 .months-list li.active {
-    background: #9b59b6;
+    background: var(--accent-color);
     color: #fff;
 }
 
 /* --- Month View Styles --- */
 .month-view {
-    padding: 10px;
+    padding: 0;
+    /* Full width for grid */
 }
 
 .month-view ul {
@@ -178,17 +241,19 @@ body {
 }
 
 .month-view .weeks {
-    margin-bottom: 20px;
+    background: var(--hover-bg);
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border-color);
 }
 
 .month-view .weeks li {
-    color: #333;
+    color: var(--text-color);
     width: calc(100% / 7);
-    font-weight: 500;
+    font-weight: 600;
 }
 
 .month-view .days {
-    margin-bottom: 20px;
+    /* Grid Layout */
 }
 
 .month-view .days li {
@@ -196,40 +261,61 @@ body {
     cursor: pointer;
     position: relative;
     width: calc(100% / 7);
-    margin-top: 30px;
+    height: 100px;
+    /* Fixed height for grid cells */
+    padding: 10px;
+    color: var(--text-color);
+    border-right: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    /* Align date to top-left */
+    justify-content: flex-start;
+}
+
+/* Add left border to first item in each row if needed, or wrap in a container with border-left */
+.month-view .days {
+    border-left: 1px solid var(--border-color);
+    border-top: 1px solid var(--border-color);
+    /* Top border for the whole grid */
 }
 
 .month-view .days li.inactive {
-    color: #aaa;
+    color: var(--text-muted);
+    background: rgba(0, 0, 0, 0.02);
 }
 
 .month-view .days li.active {
-    color: #fff;
-}
-
-.month-view .days li::before {
-    position: absolute;
-    content: "";
-    left: 50%;
-    top: 50%;
-    height: 40px;
-    width: 40px;
-    z-index: -1;
-    border-radius: 50%;
-    transform: translate(-50%, -50%);
+    color: var(--accent-color);
+    font-weight: 700;
+    background: var(--hover-bg);
+    /* Highlight today cell */
 }
 
 .month-view .days li.active::before {
-    background: #9b59b6;
+    /* Remove the circle for grid view, or adjust it */
+    content: none;
 }
 
-.month-view .days li:not(.active):hover::before {
-    background: #f2f2f2;
+.month-view .days li:hover {
+    background: var(--hover-bg);
+}
+
+/* Event Dot in Grid */
+.event-dot {
+    height: 6px;
+    width: 6px;
+    background: var(--accent-color);
+    border-radius: 50%;
+    margin-top: 5px;
+    align-self: center;
+    /* Center dot */
 }
 
 /* --- Day View Styles --- */
 .day-view {
-    padding: 10px;
+    padding: 10px 20px;
     max-height: 100%;
     overflow-y: auto;
 }
@@ -241,28 +327,30 @@ body {
 .hours-list li {
     display: flex;
     align-items: center;
-    padding: 10px 0;
-    border-bottom: 1px solid #eee;
+    padding: 15px 0;
+    border-bottom: 1px solid var(--border-color);
     font-size: 0.9rem;
-    color: #555;
+    color: var(--text-muted);
     cursor: pointer;
 }
 
 .hours-list li:hover {
-    background: #fafafa;
+    background: var(--hover-bg);
 }
 
 .hours-list li .time-slot {
     width: 60px;
     font-weight: 600;
-    color: #333;
+    color: var(--text-color);
 }
 
 .hours-list li .event-slot {
     flex-grow: 1;
     padding-left: 10px;
-    color: #999;
+    color: var(--text-muted);
     font-style: italic;
+    position: relative;
+    /* For absolute positioning of events if needed */
 }
 
 /* --- Event Modal Styles --- */
@@ -280,17 +368,18 @@ body {
 }
 
 .modal-content {
-    background: #fff;
+    background: var(--container-bg);
     padding: 25px;
     border-radius: 16px;
     width: 350px;
-    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+    box-shadow: var(--shadow);
     position: relative;
+    border: 1px solid var(--border-color);
 }
 
 .modal-content h3 {
     margin-bottom: 20px;
-    color: #333;
+    color: var(--text-color);
     font-size: 1.5rem;
 }
 
@@ -300,11 +389,11 @@ body {
     right: 20px;
     font-size: 1.5rem;
     cursor: pointer;
-    color: #878787;
+    color: var(--text-muted);
 }
 
 .close-btn:hover {
-    color: #333;
+    color: var(--text-color);
 }
 
 .input-group {
@@ -315,17 +404,19 @@ body {
 .input-group textarea {
     width: 100%;
     padding: 10px;
-    border: 1px solid #ddd;
+    border: 1px solid var(--input-border);
     border-radius: 8px;
     font-size: 1rem;
     outline: none;
     font-family: 'Outfit', sans-serif;
     resize: vertical;
+    background: var(--input-bg);
+    color: var(--text-color);
 }
 
 .input-group input:focus,
 .input-group textarea:focus {
-    border-color: #9b59b6;
+    border-color: var(--accent-color);
 }
 
 .modal-buttons {
@@ -347,12 +438,12 @@ body {
 }
 
 #save-event {
-    background: #9b59b6;
+    background: var(--accent-color);
     color: #fff;
 }
 
 #save-event:hover {
-    background: #8e44ad;
+    background: var(--accent-hover);
 }
 
 #delete-event {
@@ -363,24 +454,319 @@ body {
     opacity: 0.9;
 }
 
-/* --- Event Indicators --- */
+/* --- Event Block Styles --- */
+.day-view .event-block {
+    background: var(--hover-bg);
+    color: var(--text-color);
+    padding: 5px 8px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    margin-left: 0;
+    border-left: 4px solid var(--accent-color);
+    align-items: flex-start;
+    /* Align date to top-left */
+    justify-content: flex-start;
+}
+
+/* Add left border to first item in each row if needed, or wrap in a container with border-left */
+.month-view .days {
+    border-left: 1px solid var(--border-color);
+    border-top: 1px solid var(--border-color);
+    /* Top border for the whole grid */
+}
+
+.month-view .days li.inactive {
+    color: var(--text-muted);
+    background: rgba(0, 0, 0, 0.02);
+}
+
+.month-view .days li.active {
+    color: var(--accent-color);
+    font-weight: 700;
+    background: var(--hover-bg);
+    /* Highlight today cell */
+}
+
+.month-view .days li.active::before {
+    /* Remove the circle for grid view, or adjust it */
+    content: none;
+}
+
+.month-view .days li:hover {
+    background: var(--hover-bg);
+}
+
+/* Event Dot in Grid */
 .event-dot {
     height: 6px;
     width: 6px;
-    background: #9b59b6;
+    background: var(--accent-color);
     border-radius: 50%;
-    position: absolute;
-    bottom: 5px;
-    left: 50%;
-    transform: translateX(-50%);
+    margin-top: 5px;
+    align-self: center;
+    /* Center dot */
 }
 
+/* --- Day View Styles --- */
+.day-view {
+    padding: 10px 20px;
+    max-height: 100%;
+    overflow-y: auto;
+}
+
+.hours-list {
+    list-style: none;
+}
+
+.hours-list li {
+    display: flex;
+    align-items: center;
+    padding: 15px 0;
+    border-bottom: 1px solid var(--border-color);
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    cursor: pointer;
+}
+
+.hours-list li:hover {
+    background: var(--hover-bg);
+}
+
+.hours-list li .time-slot {
+    width: 60px;
+    font-weight: 600;
+    color: var(--text-color);
+}
+
+.hours-list li .event-slot {
+    flex-grow: 1;
+    padding-left: 10px;
+    color: var(--text-muted);
+    font-style: italic;
+    position: relative;
+    /* For absolute positioning of events if needed */
+}
+
+/* --- Event Modal Styles --- */
+.event-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: var(--container-bg);
+    padding: 25px;
+    border-radius: 16px;
+    width: 350px;
+    box-shadow: var(--shadow);
+    position: relative;
+    border: 1px solid var(--border-color);
+}
+
+.modal-content h3 {
+    margin-bottom: 20px;
+    color: var(--text-color);
+    font-size: 1.5rem;
+}
+
+.close-btn {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: var(--text-muted);
+}
+
+.close-btn:hover {
+    color: var(--text-color);
+}
+
+.input-group {
+    margin-bottom: 15px;
+}
+
+.input-group input,
+.input-group textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid var(--input-border);
+    border-radius: 8px;
+    font-size: 1rem;
+    outline: none;
+    font-family: 'Outfit', sans-serif;
+    resize: vertical;
+    background: var(--input-bg);
+    color: var(--text-color);
+}
+
+.input-group input:focus,
+.input-group textarea:focus {
+    border-color: var(--accent-color);
+}
+
+.modal-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.modal-buttons button {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 500;
+    transition: background 0.2s;
+    font-family: 'Outfit', sans-serif;
+}
+
+#save-event {
+    background: var(--accent-color);
+    color: #fff;
+}
+
+#save-event:hover {
+    background: var(--accent-hover);
+}
+
+#delete-event {
+    color: #fff;
+}
+
+#delete-event:hover {
+    opacity: 0.9;
+}
+
+/* --- Event Block Styles --- */
 .day-view .event-block {
-    background: #e0c3fc;
-    color: #5e3370;
-    padding: 2px 8px;
-    border-radius: 4px;
+    background: var(--hover-bg);
+    color: var(--text-color);
+    padding: 5px 8px;
+    border-radius: 6px;
     font-size: 0.85rem;
     font-weight: 500;
-    margin-left: 10px;
+    margin-left: 0;
+    border-left: 4px solid var(--accent-color);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    transition: transform 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+}
+
+.day-view .event-block:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    z-index: 10;
+}
+
+/* --- Event Modal Styles --- */
+.event-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: var(--container-bg);
+    padding: 25px;
+    border-radius: 16px;
+    width: 350px;
+    box-shadow: var(--shadow);
+    position: relative;
+    border: 1px solid var(--border-color);
+}
+
+.modal-content h3 {
+    margin-bottom: 20px;
+    color: var(--text-color);
+    font-size: 1.5rem;
+}
+
+.close-btn {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: var(--text-muted);
+}
+
+.close-btn:hover {
+    color: var(--text-color);
+}
+
+.input-group {
+    margin-bottom: 15px;
+}
+
+.input-group input,
+.input-group textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid var(--input-border);
+    border-radius: 8px;
+    font-size: 1rem;
+    outline: none;
+    font-family: 'Outfit', sans-serif;
+    resize: vertical;
+    background: var(--input-bg);
+    color: var(--text-color);
+}
+
+.input-group input:focus,
+.input-group textarea:focus {
+    border-color: var(--accent-color);
+}
+
+.modal-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.modal-buttons button {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 500;
+    transition: background 0.2s;
+    font-family: 'Outfit', sans-serif;
+}
+
+#save-event {
+    background: var(--accent-color);
+    color: #fff;
+}
+
+#save-event:hover {
+    background: var(--accent-hover);
+}
+
+#delete-event {
+    color: #fff;
+}
+
+#delete-event:hover {
+    opacity: 0.9;
 }
