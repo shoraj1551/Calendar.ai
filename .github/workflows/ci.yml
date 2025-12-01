@@ -1,0 +1,51 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ "main", "dev" ]
+  pull_request:
+    branches: [ "main", "dev" ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+
+    - name: Install Dependencies
+      run: |
+        if [ -f package.json ]; then
+          npm install
+        else
+          echo "No package.json found, skipping install"
+        fi
+
+    - name: Run Linting
+      run: |
+        if [ -f package.json ] && grep -q "lint" package.json; then
+          npm run lint
+        else
+          echo "Linting skipped (no script)"
+        fi
+
+    - name: Run Unit Tests
+      run: |
+        if [ -f package.json ] && grep -q "test:unit" package.json; then
+          npm run test:unit
+        else
+          echo "Unit tests skipped (no script)"
+        fi
+
+    - name: Run Functional Tests
+      run: |
+        if [ -f package.json ] && grep -q "test:e2e" package.json; then
+          npm run test:e2e
+        else
+          echo "Functional tests skipped (no script)"
+        fi

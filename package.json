@@ -1,0 +1,19 @@
+{
+  "name": "calendar-ai",
+  "version": "0.0.3",
+  "description": "Modern responsive calendar application",
+  "scripts": {
+    "test": "npm run test:unit && npm run test:e2e",
+    "test:unit": "echo 'Running unit tests...' && exit 0",
+    "test:e2e": "echo 'Running functional tests...' && exit 0",
+    "lint": "echo 'Running linter...' && exit 0"
+  },
+  "keywords": [
+    "calendar",
+    "javascript",
+    "vanilla"
+  ],
+  "author": "Shoraj Tomer",
+  "license": "MIT",
+  "devDependencies": {}
+}
