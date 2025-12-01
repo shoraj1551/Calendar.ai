@@ -5,6 +5,7 @@ import { renderDecadeView } from './views/decade.js';
 import { renderYearView } from './views/year.js';
 import { renderMonthView } from './views/month.js';
 import { renderDayView } from './views/day.js';
+import { updateBackground } from './background.js?v=0.004';
 
 const prevNextIcon = document.querySelectorAll(".icons span");
 const backBtn = document.querySelector("#back-btn");
@@ -14,16 +15,19 @@ const currentDate = document.querySelector(".current-date");
 window.selectYear = (year) => {
     setState('currYear', year);
     renderYearView();
+    updateBackground();
 };
 
 window.selectMonth = (monthIndex) => {
     setState('currMonth', monthIndex);
     renderMonthView();
+    updateBackground();
 };
 
 window.selectDay = (day) => {
     setState('currDay', day);
     renderDayView();
+    updateBackground();
 };
 
 prevNextIcon.forEach(icon => {
@@ -56,6 +60,7 @@ prevNextIcon.forEach(icon => {
             setState('currYear', currentObj.getFullYear());
             renderDayView();
         }
+        updateBackground();
     });
 });
 
@@ -67,6 +72,7 @@ backBtn.addEventListener("click", () => {
     } else if (state.currentView === 'year') {
         renderDecadeView();
     }
+    updateBackground();
 });
 
 currentDate.addEventListener("click", () => {
@@ -77,6 +83,7 @@ currentDate.addEventListener("click", () => {
     } else if (state.currentView === 'year') {
         renderDecadeView();
     }
+    updateBackground();
 });
 
 // Initialize App
@@ -85,6 +92,7 @@ const init = () => {
     // Pass renderDayView to initModal so it can re-render after saving/deleting
     initModal(renderDayView);
     renderMonthView();
+    updateBackground();
 };
 
 init();
