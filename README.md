@@ -151,31 +151,6 @@ Calendar.ai/
 ├── README.md           # This file
 ├── LICENSE             # MIT License
 └── .gitignore          # Git ignore rules
-```
-
----
-
-## 📋 Version History
-
-See [CHANGELOG.md](CHANGELOG.md) for detailed version history and incremental features.
-
-**Current Version: 0.003** (2025-11-30)
-- Design Themes (4 options)
-- Minute-Level Scheduling
-- Visual Time Blocking
-- Enhanced UI
-
----
-
-## 🤝 Contributing
-
-Contributions are welcome! Feel free to:
-- Report bugs
-- Suggest new features
-- Submit pull requests
-
----
-
 ## 📝 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
