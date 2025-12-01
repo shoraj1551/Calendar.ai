@@ -28,6 +28,10 @@ export const renderMonthView = () => {
     }
 
     for (let i = 1; i <= lastDateofMonth; i++) {
+        let dateObj = new Date(state.currYear, state.currMonth, i);
+        let dayOfWeek = dateObj.getDay();
+        let isWeekend = (dayOfWeek === 0 || dayOfWeek === 6) ? "weekend" : "";
+
         let isToday = i === new Date().getDate() && state.currMonth === new Date().getMonth()
             && state.currYear === new Date().getFullYear() ? "active" : "";
 
@@ -36,7 +40,7 @@ export const renderMonthView = () => {
         let hasEvent = state.eventsObj[eventKey] && state.eventsObj[eventKey].length > 0;
         let eventDot = hasEvent ? `<div class="event-dot"></div>` : "";
 
-        liTag += `<li class="${isToday}" onclick="selectDay(${i})">${i}${eventDot}</li>`;
+        liTag += `<li class="${isToday} ${isWeekend}" onclick="selectDay(${i})">${i}${eventDot}</li>`;
     }
 
     for (let i = lastDayofMonth; i < 6; i++) {

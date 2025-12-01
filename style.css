@@ -770,3 +770,16 @@ header {
 #delete-event:hover {
     opacity: 0.9;
 }
+/* Weekend Styling */
+.month-view .days li.weekend {
+    background-color: rgba(255, 159, 67, 0.1); /* Subtle orange/fun tint */
+}
+
+.month-view .days li.weekend:hover {
+    background-color: rgba(255, 159, 67, 0.2);
+}
+
+.month-view .days li.weekend.active {
+    background-color: var(--accent-color);
+    color: #fff;
+}
