@@ -2,7 +2,7 @@
 
 A modern, responsive calendar application with multi-level navigation, event management, and beautiful themes. Built with vanilla JavaScript, HTML5, and CSS3.
 
-![Version](https://img.shields.io/badge/version-0.003-blue)
+![Version](https://img.shields.io/badge/version-0.004-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 ![Status](https://img.shields.io/badge/status-stable-success)
 
@@ -30,6 +30,7 @@ Choose from 4 stunning themes:
 - **Dark** - Easy on the eyes
 - **Gradient** - Vibrant and modern
 - **Minimal** - Simple and elegant
+- **Dynamic Backgrounds** - Context-aware visuals for every view
 
 ### 🎯 User Experience
 - Responsive design (works on desktop and tablet)
@@ -37,6 +38,17 @@ Choose from 4 stunning themes:
 - Event indicators on calendar dates
 - Modern UI with Google Fonts (Outfit)
 - Intuitive back button navigation
+
+- Intuitive back button navigation
+
+### 📜 Version History & Features
+
+| Version | Date | Key Features |
+| :--- | :--- | :--- |
+| **0.004** | 2025-12-01 | • Dynamic Backgrounds (Decade/Year/Day views)<br>• Time-based Day View Backgrounds (Morning/Noon/Evening/Night)<br>• Enhanced Text Readability |
+| **0.003** | 2025-11-30 | • 4 Visual Themes (Light, Dark, Gradient, Minimal)<br>• Minute-Level Scheduling<br>• Responsive Design<br>• Modern UI with Google Fonts |
+| **0.002** | 2025-11-30 | • Event Subject & Agenda<br>• LocalStorage Persistence<br>• Event Editing & Deletion |
+| **0.001** | 2025-11-30 | • Multi-Level Navigation (Decade/Year/Month/Day)<br>• Basic Event Creation<br>• Core Calendar Views |
 
 ---
 
