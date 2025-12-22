@@ -1,8 +1,22 @@
 "use client";
 
+import { format, isSameDay, areIntervalsOverlapping } from "date-fns";
+import { Loader2, Calendar as CalendarIcon, Clock, Briefcase, User, Zap, Shield, AlertTriangle } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { useCalendarEvents } from "@/features/calendar/hooks/use-calendar-events";
-import { format, isSameDay } from "date-fns";
-import { Loader2, Calendar as CalendarIcon, Clock } from "lucide-react";
+
+const getEventType = (e: any) => {
+    const title = e.title.toLowerCase();
+    if (e.type === 'personal') return 'personal';
+    if (title.includes('focus') || title.includes('deep work') || title.includes('lunch')) return 'focus';
+    return 'work';
+};
+
+const TYPE_STYLES = {
+    work: { border: "border-blue-500", bg: "bg-blue-50 dark:bg-blue-900/20", icon: Briefcase, text: "text-blue-700 dark:text-blue-300", protected: false },
+    focus: { border: "border-green-500", bg: "bg-green-50/50 dark:bg-green-900/10", icon: Zap, text: "text-green-700 dark:text-green-300", protected: true },
+    personal: { border: "border-orange-500", bg: "bg-orange-50/50 dark:bg-orange-900/10", icon: User, text: "text-orange-700 dark:text-orange-300", protected: true },
+};
 
 export function TimelineWidget() {
     const { events, loading: isLoading } = useCalendarEvents();
@@ -33,36 +47,58 @@ export function TimelineWidget() {
                 </span>
             </div>
 
-            <div className="space-y-4 overflow-y-auto flex-1 pr-2 custom-scrollbar">
+            <div className="space-y-0 relative flex-1 overflow-y-auto custom-scrollbar pr-2">
                 {todaysEvents.length === 0 ? (
                     <div className="text-center py-10 text-gray-400">
                         <p>No events scheduled today.</p>
                         <p className="text-sm mt-1">Enjoy your freedom!</p>
                     </div>
                 ) : (
-                    todaysEvents.map((event) => {
+                    todaysEvents.map((event, i) => {
                         const isPast = event.end < new Date();
                         const isNow = event.start <= new Date() && event.end >= new Date();
+                        const type = getEventType(event);
+                        const styles = TYPE_STYLES[type as keyof typeof TYPE_STYLES];
+                        const Icon = styles.icon;
 
                         return (
-                            <div
-                                key={event.id}
-                                className={`relative pl-4 border-l-2 transition-all group ${isNow ? "border-blue-500" : isPast ? "border-gray-200 dark:border-gray-700" : "border-blue-200 dark:border-blue-800"
-                                    }`}
-                            >
-                                {/* Time Indicator Dot */}
-                                <div className={`absolute -left-[5px] top-0 w-2 h-2 rounded-full ${isNow ? "bg-blue-500 animate-pulse" : isPast ? "bg-gray-300 dark:bg-gray-600" : "bg-blue-300 dark:bg-blue-700"
-                                    }`} />
+                            <div key={event.id} className="relative pl-6 py-2 group">
+                                {/* Connector Line */}
+                                {i !== todaysEvents.length - 1 && (
+                                    <div className="absolute left-[9px] top-8 bottom-[-8px] w-[2px] bg-gray-100 dark:bg-gray-800" />
+                                )}
 
-                                <div className="flex flex-col gap-1">
-                                    <span className={`text-xs font-mono font-medium ${isNow ? "text-blue-600 dark:text-blue-400" : "text-gray-500"}`}>
-                                        {format(event.start, "h:mm a")} - {format(event.end, "h:mm a")}
-                                    </span>
-                                    <h4 className={`font-medium text-sm ${isPast ? "text-gray-500 line-through decoration-gray-300" : "text-gray-900 dark:text-gray-100"}`}>
+                                {/* Dot / Icon */}
+                                <div className={`absolute left-0 top-3 w-5 h-5 rounded-full flex items-center justify-center border-2 border-white dark:border-gray-900 z-10 transition-all
+                                    ${isNow ? "bg-red-500 scale-110 shadow-md ring-2 ring-red-200" : isPast ? "bg-gray-300" : styles.bg.replace('/20', '')}
+                                `}>
+                                    {isNow ? (
+                                        <div className="w-1.5 h-1.5 bg-white rounded-full animate-pulse" />
+                                    ) : (
+                                        <Icon className={`w-3 h-3 text-white`} />
+                                    )}
+                                </div>
+
+                                {/* Event Card */}
+                                <div className={`rounded-lg p-3 transition-all border-l-4 ${styles.border} ${isNow ? "bg-white shadow-md ring-1 ring-gray-100 dark:bg-gray-800 dark:ring-gray-700" : "hover:bg-gray-50 dark:hover:bg-gray-800/50"} ${isPast ? "opacity-60 grayscale" : ""}`}>
+                                    <div className="flex justify-between items-start mb-1">
+                                        <span className="text-xs font-mono font-medium text-gray-500">
+                                            {format(event.start, "h:mm")} - {format(event.end, "h:mm a")}
+                                        </span>
+                                        {isNow && <span className="text-[10px] font-bold text-red-500 uppercase tracking-wider animate-pulse">Now</span>}
+                                    </div>
+
+                                    <h4 className={`font-medium text-sm ${styles.text}`}>
                                         {event.title}
                                     </h4>
+
+                                    {/* Location / Details on Hover */}
                                     {event.location && (
-                                        <p className="text-xs text-gray-400 truncate max-w-[200px]">{event.location}</p>
+                                        <div className="hidden group-hover:block pt-2 animate-in fade-in slide-in-from-top-1">
+                                            <p className="text-xs text-gray-500 flex items-center gap-1">
+                                                📍 {event.location}
+                                            </p>
+                                        </div>
                                     )}
                                 </div>
                             </div>
@@ -77,11 +113,10 @@ export function TimelineWidget() {
                     <Clock className="w-3 h-3" />
                     <span>{Math.round(todaysEvents.reduce((acc, e) => acc + (e.end.getTime() - e.start.getTime()) / 3600000, 0) * 10) / 10}h Planned</span>
                 </div>
-                <div className="flex items-center gap-1">
-                    <span className="w-2 h-2 rounded-full bg-blue-500"></span>
-                    <span>Focus</span>
-                    <span className="w-2 h-2 rounded-full bg-green-500 ml-2"></span>
-                    <span>Free</span>
+                <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-blue-400"></span> Work</div>
+                    <div className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-green-500"></span> Focus</div>
+                    <div className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-orange-400"></span> Personal</div>
                 </div>
             </div>
         </div>

@@ -8,6 +8,8 @@ export interface Suggestion {
     title: string;
     description: string;
     score: number; // Confidence/Impact score (0-100)
+    reason?: string; // Explanation for the suggestion
+    time?: string; // Human readable time context (e.g. "Tomorrow 10 AM")
     action: {
         type: "create" | "update" | "delete";
         event?: Partial<UnifiedEvent>; // The payload to apply

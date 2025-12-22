@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { CheckCircle2, TrendingUp, AlertCircle, ArrowRight } from "lucide-react";
+import { CheckCircle2, TrendingUp, AlertCircle, ArrowRight, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface Task {
@@ -11,17 +11,25 @@ interface Task {
     dueDate?: string;
 }
 
+interface AccountabilityData {
+    score: number;
+    metrics: {
+        focusMinutes: number;
+        focusGoal: number;
+        overdueTasks: number;
+    };
+    nudges: Task[];
+}
+
 export function AccountabilityWidget() {
-    const [score, setScore] = useState(85); // Mock start score
-    const [tasks, setTasks] = useState<Task[]>([]);
+    const [data, setData] = useState<AccountabilityData | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        // Fetch pending tasks from API
-        fetch("/api/tasks?status=todo")
+        fetch("/api/intelligence/accountability")
             .then(res => res.json())
             .then(data => {
-                setTasks(data.slice(0, 3)); // Top 3
+                setData(data);
                 setIsLoading(false);
             })
             .catch(e => setIsLoading(false));
@@ -33,6 +41,16 @@ export function AccountabilityWidget() {
         return "text-orange-600 dark:text-orange-400";
     };
 
+    if (isLoading || !data) {
+        return (
+            <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-100 dark:border-gray-800 p-6 h-full flex items-center justify-center">
+                <Loader2 className="w-6 h-6 animate-spin text-gray-400" />
+            </div>
+        );
+    }
+
+    const { score, metrics, nudges } = data;
+
     return (
         <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-100 dark:border-gray-800 p-6 h-full flex flex-col">
             <div className="flex items-center justify-between mb-6">
@@ -43,7 +61,7 @@ export function AccountabilityWidget() {
             </div>
 
             <div className="flex items-center gap-6 mb-8">
-                {/* Score Ring (Simple SVG) */}
+                {/* Score Ring */}
                 <div className="relative w-24 h-24 flex items-center justify-center">
                     <svg className="w-full h-full transform -rotate-90">
                         <circle cx="48" cy="48" r="40" stroke="currentColor" strokeWidth="8" fill="transparent" className="text-gray-100 dark:text-gray-800" />
@@ -56,9 +74,12 @@ export function AccountabilityWidget() {
                 </div>
 
                 <div className="flex-1">
-                    <h4 className="font-medium text-gray-900 dark:text-gray-100 mb-1">You're doing great!</h4>
+                    <h4 className="font-medium text-gray-900 dark:text-gray-100 mb-1">
+                        {score >= 80 ? "You're doing great!" : score >= 50 ? "Keep pushing." : "Let's focus."}
+                    </h4>
                     <p className="text-sm text-gray-500 leading-snug">
-                        Your focus time is up 12% this week. Clear these tasks to hit 90+.
+                        {metrics.focusMinutes}m focus logged ({Math.round(metrics.focusMinutes / metrics.focusGoal * 100)}% of goal).
+                        {metrics.overdueTasks > 0 ? ` ${metrics.overdueTasks} overdue tasks.` : " No overdue tasks."}
                     </p>
                 </div>
             </div>
@@ -70,12 +91,10 @@ export function AccountabilityWidget() {
                 </h5>
 
                 <div className="space-y-3">
-                    {isLoading ? (
-                        <div className="h-20 bg-gray-50 dark:bg-gray-800 rounded-lg animate-pulse" />
-                    ) : tasks.length === 0 ? (
+                    {nudges.length === 0 ? (
                         <div className="text-sm text-gray-500 italic">No pending tasks. You are free!</div>
                     ) : (
-                        tasks.map(task => (
+                        nudges.map(task => (
                             <div key={task.id} className="group flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-transparent hover:border-blue-200 dark:hover:border-blue-800 transition-all cursor-pointer">
                                 <div className="flex items-center gap-3">
                                     <div className={cn("w-2 h-2 rounded-full", task.priority === 'high' ? 'bg-red-500' : 'bg-blue-500')} />

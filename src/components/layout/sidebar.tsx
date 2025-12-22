@@ -1,6 +1,7 @@
 "use client";
 
 import { Calendar, LayoutDashboard, Settings, Mic, Activity } from "lucide-react";
+import { LogoutButton } from "@/components/home/auth-buttons";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
@@ -43,7 +44,8 @@ export function Sidebar({ className }: { className?: string }) {
                 })}
             </nav>
 
-            <div className="p-4 border-t border-gray-100 dark:border-gray-800">
+            <div className="p-4 border-t border-gray-100 dark:border-gray-800 space-y-4">
+                <LogoutButton className="w-full justify-start text-gray-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/10" />
                 <div className="text-xs text-gray-400 text-center">
                     v0.1.0 Alpha
                 </div>

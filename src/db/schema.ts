@@ -4,6 +4,9 @@ export const users = pgTable("users", {
     id: uuid("id").defaultRandom().primaryKey(),
     email: text("email").notNull().unique(),
     name: text("name"),
+    onboardingStatus: text("onboarding_status", { enum: ["pending", "completed"] }).default("pending"),
+    workStart: text("work_start").default("09:00"),
+    workEnd: text("work_end").default("17:00"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 

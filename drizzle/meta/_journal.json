@@ -50,6 +50,13 @@
       "when": 1766341559483,
       "tag": "0006_bored_warlock",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1766375614951,
+      "tag": "0007_noisy_senator_kelly",
+      "breakpoints": true
     }
   ]
 }

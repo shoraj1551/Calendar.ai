@@ -1,6 +1,7 @@
 "use client";
 
-import { CheckCircle2, ListTodo, FileText, ArrowRight } from "lucide-react";
+import { useState } from "react";
+import { CheckCircle2, ListTodo, FileText, ArrowRight, Loader2, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
@@ -12,6 +13,31 @@ interface SummaryViewProps {
 }
 
 export function SummaryView({ summary, actionItems, transcript, onClose }: SummaryViewProps) {
+    const [isSaving, setIsSaving] = useState(false);
+    const [saved, setSaved] = useState(false);
+
+    const handleAddToTasks = async () => {
+        setIsSaving(true);
+        try {
+            await Promise.all(actionItems.map(item =>
+                fetch("/api/tasks", {
+                    method: "POST",
+                    body: JSON.stringify({
+                        title: item,
+                        priority: "medium", // Default priority
+                        // Default due date: Tomorrow? Let's leave it unset for now or set logic elsewhere
+                    })
+                })
+            ));
+            setSaved(true);
+            setTimeout(() => setSaved(false), 3000);
+        } catch (error) {
+            console.error("Failed to save tasks", error);
+        } finally {
+            setIsSaving(false);
+        }
+    };
+
     return (
         <div className="w-full max-w-4xl mx-auto space-y-6 animate-in fade-in slide-in-from-bottom-4">
 
@@ -59,8 +85,20 @@ export function SummaryView({ summary, actionItems, transcript, onClose }: Summa
                                 </li>
                             ))}
                         </ul>
-                        <Button className="w-full mt-6" variant="secondary">
-                            Add All to Tasks <ArrowRight className="w-4 h-4 ml-2" />
+                        <Button
+                            className="w-full mt-6"
+                            variant={saved ? "outline" : "secondary"}
+                            onClick={handleAddToTasks}
+                            disabled={isSaving || saved}
+                        >
+                            {isSaving ? (
+                                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                            ) : saved ? (
+                                <Check className="w-4 h-4 mr-2" />
+                            ) : (
+                                <ArrowRight className="w-4 h-4 mr-2" />
+                            )}
+                            {isSaving ? "Saving..." : saved ? "All Added!" : "Add All to Tasks"}
                         </Button>
                     </CardContent>
                 </Card>

@@ -58,5 +58,23 @@ export const EventRepository = {
             description: e.description || undefined,
             location: e.location || undefined,
         }));
+    },
+    // Update
+    async update(id: string, data: Partial<UnifiedEvent>) {
+        const [updatedEvent] = await db.update(events).set({
+            title: data.title,
+            description: data.description,
+            startTime: data.start,
+            endTime: data.end,
+            allDay: data.allDay,
+            location: data.location,
+            type: data.type,
+        }).where(eq(events.id, id)).returning();
+        return updatedEvent;
+    },
+
+    // Delete
+    async delete(id: string) {
+        await db.delete(events).where(eq(events.id, id));
     }
 };
