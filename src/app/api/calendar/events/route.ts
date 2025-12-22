@@ -21,7 +21,8 @@ export async function GET() {
         return NextResponse.json({ events });
     } catch (error) {
         console.error("Sync API Error:", error);
-        return NextResponse.json({ error: "Failed to sync calendar" }, { status: 500 });
+        const errorMessage = error instanceof Error ? error.message : "Unknown error";
+        return NextResponse.json({ error: `Failed to sync calendar: ${errorMessage}` }, { status: 500 });
     }
 }
 

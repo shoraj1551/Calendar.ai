@@ -94,3 +94,9 @@ export const notifications = pgTable("notifications", {
         scheduledForIdx: index("scheduled_for_idx").on(table.scheduledFor),
     };
 });
+
+export const userSettings = pgTable("user_settings", {
+    userId: uuid("user_id").references(() => users.id).primaryKey(),
+    preferences: jsonb("preferences").notNull().default({}),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});

@@ -46,7 +46,10 @@ export default async function DashboardPage() {
                     </h1>
                     <div className="mt-2 text-gray-500 dark:text-gray-400 flex items-center gap-4">
                         <CapacityIndicator />
-                        <AutomationSettings />
+                        <CapacityIndicator />
+                        <a href="/settings" className="flex items-center gap-1.5 text-xs font-medium bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 px-3 py-1.5 rounded-full transition-colors">
+                            <span>Automation Controls</span>
+                        </a>
                     </div>
                 </div>
                 <div className="flex items-center gap-2">

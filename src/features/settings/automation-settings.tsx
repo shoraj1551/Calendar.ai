@@ -1,88 +1,138 @@
 "use client";
 
-import { useState } from "react";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Shield, Sparkles, MessageSquare, Clock, AlertTriangle } from "lucide-react";
-import { Switch } from "@/components/ui/switch"; // Assuming we have this, or will mock basic toggle
+import { Cpu, MessageSquare, CalendarClock, ListTodo, Zap, BrainCircuit } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import { cn } from "@/lib/utils";
 
-export function AutomationSettings() {
-    const [isOpen, setIsOpen] = useState(false);
+interface AutomationSettingsProps {
+    settings: any;
+    update: (key: string, value: any) => void;
+}
 
-    // Mock Settings State (In real app, persist to DB/LocalStorage)
-    const [settings, setSettings] = useState({
-        prompts: true,
-        scheduling: true,
-        briefing: true
-    });
+export function AutomationSettings({ settings, update }: AutomationSettingsProps) {
 
-    const toggle = (key: keyof typeof settings) => {
-        setSettings(prev => ({ ...prev, [key]: !prev[key] }));
+    const toggle = (key: string) => {
+        update(key, !settings[key]);
     };
 
     return (
-        <Dialog open={isOpen} onOpenChange={setIsOpen}>
-            <DialogTrigger asChild>
-                <Button variant="ghost" size="icon" className="text-gray-400 hover:text-gray-600">
-                    <Shield className="w-4 h-4" />
-                </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-md bg-white dark:bg-gray-950 border-gray-100 dark:border-gray-800">
-                <div className="space-y-6">
-                    <div>
-                        <h2 className="text-xl font-bold flex items-center gap-2">
-                            <Shield className="w-5 h-5 text-indigo-500" />
-                            AI Control Center
-                        </h2>
-                        <p className="text-sm text-gray-500">You are in charge. Disable any agent you don't trust.</p>
-                    </div>
+        <div className="space-y-8 animate-in fade-in duration-500">
+            <div>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-2 mb-2">
+                    <Cpu className="w-5 h-5 text-purple-500" />
+                    Automation & AI Controls
+                </h3>
+                <p className="text-sm text-gray-500 max-w-2xl">
+                    Control how proactive the assistant is. You can enable or disable specific capabilities to match your comfort level.
+                    <span className="block mt-1 font-medium text-purple-600 dark:text-purple-400">
+                        No hidden actions. You see exactly what the AI is allowed to do.
+                    </span>
+                </p>
+            </div>
 
-                    <div className="space-y-4">
-                        {/* Context Prompts */}
-                        <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
-                            <div className="flex items-start gap-3">
-                                <MessageSquare className="w-5 h-5 text-blue-500 mt-0.5" />
-                                <div>
-                                    <h4 className="font-medium">Context Whispers</h4>
-                                    <p className="text-xs text-gray-500">Subtle nudges when your schedule looks risky.</p>
-                                </div>
+            <div className="grid gap-6">
+
+                {/* 1. Rescheduling Suggestions */}
+                <div className={cn(
+                    "p-5 rounded-xl border transition-all duration-200",
+                    settings.scheduling ? "bg-white dark:bg-gray-900 border-purple-100 dark:border-purple-900/20 shadow-sm" : "bg-gray-50 dark:bg-gray-900/50 border-gray-100 dark:border-gray-800 opacity-80"
+                )}>
+                    <div className="flex items-start justify-between gap-4">
+                        <div className="flex items-start gap-4">
+                            <div className="mt-1 p-2 rounded-lg bg-pink-50 dark:bg-pink-900/10 text-pink-600 dark:text-pink-400">
+                                <CalendarClock className="w-5 h-5" />
                             </div>
-                            <Switch checked={settings.prompts} onCheckedChange={() => toggle('prompts')} />
-                        </div>
-
-                        {/* Auto Scheduling */}
-                        <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
-                            <div className="flex items-start gap-3">
-                                <Clock className="w-5 h-5 text-green-500 mt-0.5" />
-                                <div>
-                                    <h4 className="font-medium">Auto-Scheduler</h4>
-                                    <p className="text-xs text-gray-500">Allows AI to suggest times for tasks/breaks.</p>
-                                </div>
+                            <div className="space-y-1">
+                                <h4 className="font-medium text-gray-900 dark:text-gray-100">Rescheduling Suggestions</h4>
+                                <p className="text-sm text-gray-500 max-w-md">
+                                    Allow the AI to propose better time slots when you are double-booked or overloaded.
+                                </p>
+                                <p className="text-xs text-purple-600 dark:text-purple-400 font-medium mt-2 flex items-center gap-1">
+                                    <Zap className="w-3 h-3" />
+                                    When ON: You'll see "Fix Schedule" buttons on conflicting events.
+                                </p>
                             </div>
-                            <Switch checked={settings.scheduling} onCheckedChange={() => toggle('scheduling')} />
                         </div>
-
-                        {/* Briefing */}
-                        <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
-                            <div className="flex items-start gap-3">
-                                <Sparkles className="w-5 h-5 text-purple-500 mt-0.5" />
-                                <div>
-                                    <h4 className="font-medium">Daily Briefing</h4>
-                                    <p className="text-xs text-gray-500">Morning and Evening AI summaries.</p>
-                                </div>
-                            </div>
-                            <Switch checked={settings.briefing} onCheckedChange={() => toggle('briefing')} />
-                        </div>
-                    </div>
-
-                    <div className="p-3 bg-amber-50 dark:bg-amber-900/20 rounded border border-amber-100 dark:border-amber-900/30 flex gap-2">
-                        <AlertTriangle className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
-                        <p className="text-xs text-amber-700 dark:text-amber-300">
-                            Disabling these means you will manage everything manually. The AI will not intervene.
-                        </p>
+                        <Switch checked={settings.scheduling} onCheckedChange={() => toggle('scheduling')} />
                     </div>
                 </div>
-            </DialogContent>
-        </Dialog>
+
+                {/* 2. Task Creation from Meetings */}
+                <div className={cn(
+                    "p-5 rounded-xl border transition-all duration-200",
+                    settings.autoTranscribe ? "bg-white dark:bg-gray-900 border-blue-100 dark:border-blue-900/20 shadow-sm" : "bg-gray-50 dark:bg-gray-900/50 border-gray-100 dark:border-gray-800 opacity-80"
+                )}>
+                    <div className="flex items-start justify-between gap-4">
+                        <div className="flex items-start gap-4">
+                            <div className="mt-1 p-2 rounded-lg bg-blue-50 dark:bg-blue-900/10 text-blue-600 dark:text-blue-400">
+                                <ListTodo className="w-5 h-5" />
+                            </div>
+                            <div className="space-y-1">
+                                <h4 className="font-medium text-gray-900 dark:text-gray-100">Task Extraction</h4>
+                                <p className="text-sm text-gray-500 max-w-md">
+                                    Automatically detect action items in meeting notes and add them to your task list.
+                                </p>
+                                <p className="text-xs text-blue-600 dark:text-blue-400 font-medium mt-2 flex items-center gap-1">
+                                    <Zap className="w-3 h-3" />
+                                    When ON: Action items appear in your "Pending" review queue.
+                                </p>
+                            </div>
+                        </div>
+                        <Switch checked={settings.autoTranscribe} onCheckedChange={() => toggle('autoTranscribe')} />
+                    </div>
+                </div>
+
+                {/* 3. Daily AI Summary */}
+                <div className={cn(
+                    "p-5 rounded-xl border transition-all duration-200",
+                    settings.briefing ? "bg-white dark:bg-gray-900 border-amber-100 dark:border-amber-900/20 shadow-sm" : "bg-gray-50 dark:bg-gray-900/50 border-gray-100 dark:border-gray-800 opacity-80"
+                )}>
+                    <div className="flex items-start justify-between gap-4">
+                        <div className="flex items-start gap-4">
+                            <div className="mt-1 p-2 rounded-lg bg-amber-50 dark:bg-amber-900/10 text-amber-600 dark:text-amber-400">
+                                <MessageSquare className="w-5 h-5" />
+                            </div>
+                            <div className="space-y-1">
+                                <h4 className="font-medium text-gray-900 dark:text-gray-100">Daily Briefing & Summary</h4>
+                                <p className="text-sm text-gray-500 max-w-md">
+                                    Receive a morning briefing of your day and an evening summary of what you accomplished.
+                                </p>
+                                <p className="text-xs text-amber-600 dark:text-amber-400 font-medium mt-2 flex items-center gap-1">
+                                    <Zap className="w-3 h-3" />
+                                    When ON: A "Start Day" card appears at 8:00 AM on your dashboard.
+                                </p>
+                            </div>
+                        </div>
+                        <Switch checked={settings.briefing} onCheckedChange={() => toggle('briefing')} />
+                    </div>
+                </div>
+
+                {/* 4. Smart Nudges */}
+                <div className={cn(
+                    "p-5 rounded-xl border transition-all duration-200",
+                    settings.prompts ? "bg-white dark:bg-gray-900 border-emerald-100 dark:border-emerald-900/20 shadow-sm" : "bg-gray-50 dark:bg-gray-900/50 border-gray-100 dark:border-gray-800 opacity-80"
+                )}>
+                    <div className="flex items-start justify-between gap-4">
+                        <div className="flex items-start gap-4">
+                            <div className="mt-1 p-2 rounded-lg bg-emerald-50 dark:bg-emerald-900/10 text-emerald-600 dark:text-emerald-400">
+                                <BrainCircuit className="w-5 h-5" />
+                            </div>
+                            <div className="space-y-1">
+                                <h4 className="font-medium text-gray-900 dark:text-gray-100">Smart Nudges</h4>
+                                <p className="text-sm text-gray-500 max-w-md">
+                                    Gentle reminders to take breaks, focus, or wrap up meetings that are running late.
+                                </p>
+                                <p className="text-xs text-emerald-600 dark:text-emerald-400 font-medium mt-2 flex items-center gap-1">
+                                    <Zap className="w-3 h-3" />
+                                    When ON: You'll see small, non-intrusive toasts during work hours.
+                                </p>
+                            </div>
+                        </div>
+                        <Switch checked={settings.prompts} onCheckedChange={() => toggle('prompts')} />
+                    </div>
+                </div>
+
+            </div>
+        </div>
     );
 }
