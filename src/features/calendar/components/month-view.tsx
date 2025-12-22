@@ -61,7 +61,14 @@ export function MonthView({ currentDate, events }: MonthViewProps) {
                                             key={event.id}
                                             className={cn(
                                                 "truncate px-1 text-[10px] rounded-sm cursor-pointer",
-                                                event.type === "work" ? "bg-primary/90 text-primary-foreground" : "bg-green-500/90 text-white"
+                                                event.type === "work" && "bg-blue-600/90 text-white",
+                                                event.type === "personal" && "bg-purple-600/90 text-white",
+                                                // @ts-ignore
+                                                event.type === "lunch" && "bg-orange-100/90 text-orange-800 border box-border border-orange-300",
+                                                // @ts-ignore
+                                                event.type === "break" && "bg-teal-100/90 text-teal-800",
+                                                // @ts-ignore
+                                                event.type === "holiday" && "bg-red-100/90 text-red-800 font-medium"
                                             )}
                                             title={event.title}
                                         >

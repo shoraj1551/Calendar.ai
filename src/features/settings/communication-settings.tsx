@@ -8,6 +8,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { cn } from "@/lib/utils";
+import { SettingsHeader } from "@/features/settings/components/settings-header";
 
 export function CommunicationSettings({ settings, update }: { settings: any, update: (k: string, v: any) => void }) {
     // Local state removed, using props
@@ -28,10 +29,11 @@ export function CommunicationSettings({ settings, update }: { settings: any, upd
 
     return (
         <div className="space-y-6">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-2">
-                <Mail className="w-4 h-4 text-orange-500" />
-                Communication & Noise
-            </h3>
+            <SettingsHeader
+                title="Notifications & Communication"
+                description="Controls how and when the AI assistant contacts you. Optimize for fewer interruptions or more frequent updates."
+                icon={Bell}
+            />
 
             {/* Toggles */}
             <div className="space-y-4">

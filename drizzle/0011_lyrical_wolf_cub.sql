@@ -1,0 +1,2 @@
+ALTER TABLE "events" ADD COLUMN "connected_account_id" uuid;--> statement-breakpoint
+ALTER TABLE "events" ADD CONSTRAINT "events_connected_account_id_connected_accounts_id_fk" FOREIGN KEY ("connected_account_id") REFERENCES "public"."connected_accounts"("id") ON DELETE no action ON UPDATE no action;

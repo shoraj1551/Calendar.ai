@@ -64,6 +64,34 @@
       "when": 1766381827559,
       "tag": "0008_natural_venom",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1766393942470,
+      "tag": "0009_overrated_exiles",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1766396494791,
+      "tag": "0010_yellow_shard",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1766397199390,
+      "tag": "0011_lyrical_wolf_cub",
+      "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1766402570214,
+      "tag": "0012_long_shockwave",
+      "breakpoints": true
     }
   ]
 }

@@ -1,3 +1,4 @@
+
 import { startOfWeek, endOfWeek, eachDayOfInterval, format, isSameDay, addHours, startOfDay, differenceInMinutes, isToday } from "date-fns";
 import { cn } from "@/lib/utils";
 import { UnifiedEvent } from "@/services/calendar/types";
@@ -36,34 +37,6 @@ export function WeekView({ currentDate, events }: WeekViewProps) {
                         >
                             {format(day, "d")}
                         </div>
-                        {/* Events Overlay */}
-                        {events
-                            .filter((event) => isSameDay(event.start, day))
-                            .map((event) => {
-                                const startMinutes = differenceInMinutes(event.start, startOfDay(event.start));
-                                const durationMinutes = differenceInMinutes(event.end, event.start);
-                                const top = (startMinutes / 1440) * 100; // % of day
-                                const height = (durationMinutes / 1440) * 100;
-
-                                return (
-                                    <div
-                                        key={event.id}
-                                        className={cn(
-                                            "absolute left-0 right-0 m-1 rounded p-1 text-xs leading-tight overflow-hidden",
-                                            event.type === "work" ? "bg-primary/90 text-primary-foreground" : "bg-green-500/90 text-white"
-                                        )}
-                                        style={{
-                                            top: `${top}%`,
-                                            height: `${height}%`,
-                                            minHeight: "20px"
-                                        }}
-                                        title={`${event.title} (${format(event.start, "HH:mm")} - ${format(event.end, "HH:mm")})`}
-                                    >
-                                        <div className="font-semibold">{event.title}</div>
-                                        <div className="text-[10px]">{format(event.start, "h:mma")}</div>
-                                    </div>
-                                );
-                            })}
                     </div>
                 ))}
             </div>
@@ -89,16 +62,54 @@ export function WeekView({ currentDate, events }: WeekViewProps) {
                             <div
                                 key={day.toString()}
                                 className={cn(
-                                    "flex-1 border-r border-b last:border-r-0",
+                                    "flex-1 border-r border-b last:border-r-0 relative min-w-[120px]",
                                     isToday(day) && "bg-muted/10"
                                 )}
                             >
+                                {/* Grid Lines */}
                                 {hours.map((hour) => (
                                     <div
                                         key={`${day}-${hour}`}
                                         className="h-[60px] border-b border-dashed border-border/50 hover:bg-muted/20 transition-colors"
                                     />
                                 ))}
+
+                                {/* Events */}
+                                {events
+                                    .filter((event) => isSameDay(event.start, day))
+                                    .map((event) => {
+                                        const startMinutes = differenceInMinutes(event.start, startOfDay(event.start));
+                                        const durationMinutes = differenceInMinutes(event.end, event.start);
+                                        const top = startMinutes; // 1min = 1px scaling
+                                        const height = Math.max(20, durationMinutes);
+
+                                        let baseClass = "bg-primary text-primary-foreground";
+                                        if (event.type === "work") baseClass = "bg-blue-600/90 text-white border-l-2 border-blue-800";
+                                        if (event.type === "personal") baseClass = "bg-purple-600/90 text-white border-l-2 border-purple-800";
+                                        // @ts-ignore
+                                        if (event.type === "lunch") baseClass = "bg-orange-100/90 text-orange-800 border-l-2 border-orange-400 bg-[url('/patterns/diagonal.png')]";
+                                        // @ts-ignore
+                                        if (event.type === "break") baseClass = "bg-teal-100/90 text-teal-800 border-l-2 border-teal-400";
+                                        // @ts-ignore
+                                        if (event.type === "holiday") baseClass = "bg-red-50/90 text-red-800 border-l-2 border-red-400";
+
+                                        return (
+                                            <div
+                                                key={event.id}
+                                                className={cn(
+                                                    "absolute left-0.5 right-0.5 rounded px-1 text-[10px] leading-tight overflow-hidden shadow-sm hover:z-50 hover:brightness-105 cursor-pointer",
+                                                    baseClass
+                                                )}
+                                                style={{
+                                                    top: `${top}px`,
+                                                    height: `${height}px`,
+                                                }}
+                                                title={`${event.title} (${format(event.start, "h:mm a")})`}
+                                            >
+                                                <div className="font-semibold truncate">{event.title}</div>
+                                            </div>
+                                        );
+                                    })}
                             </div>
                         ))}
                     </div>

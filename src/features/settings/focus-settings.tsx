@@ -4,6 +4,7 @@ import { Zap, BellOff, Shield, Coffee, Clock } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Slider } from "@/components/ui/slider";
 import { cn } from "@/lib/utils";
+import { SettingsHeader } from "@/features/settings/components/settings-header";
 
 export function FocusSettings({ settings, update }: { settings: any, update: (k: string, v: any) => void }) {
     const toggle = (key: string) => {
@@ -15,11 +16,12 @@ export function FocusSettings({ settings, update }: { settings: any, update: (k:
     };
 
     return (
-        <div className="space-y-8">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-2">
-                <Zap className="w-4 h-4 text-amber-500" />
-                Focus & Deep Work
-            </h3>
+        <div className="space-y-8 animate-in fade-in duration-500">
+            <SettingsHeader
+                title="Focus & Deep Work"
+                description="Configure how the assistant protects your deep work sessions."
+                icon={Zap}
+            />
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 {/* System State Visualization */}
@@ -59,7 +61,7 @@ export function FocusSettings({ settings, update }: { settings: any, update: (k:
                             <span className="text-sm font-medium text-blue-600 dark:text-blue-400">{settings.focusDuration?.[0] || 45} min</span>
                         </div>
                         <Slider
-                            defaultValue={settings.focusDuration}
+                            value={settings.focusDuration}
                             min={15}
                             max={120}
                             step={15}

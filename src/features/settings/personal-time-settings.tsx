@@ -6,6 +6,7 @@ import { Switch } from "@/components/ui/switch";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
+import { SettingsHeader } from "@/features/settings/components/settings-header";
 
 export function PersonalTimeSettings({ settings, update }: { settings: any, update: (k: string, v: any) => void }) {
     const toggle = (key: string) => {
@@ -17,11 +18,12 @@ export function PersonalTimeSettings({ settings, update }: { settings: any, upda
     };
 
     return (
-        <div className="space-y-8">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-2">
-                <Coffee className="w-4 h-4 text-emerald-500" />
-                Personal Time & Protection
-            </h3>
+        <div className="space-y-8 animate-in fade-in duration-500">
+            <SettingsHeader
+                title="Personal Time Rules"
+                description="Define your boundaries. The AI will prioritize your health and work-life balance based on these rules."
+                icon={Clock}
+            />
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 {/* Visual Preview */}
@@ -110,7 +112,7 @@ export function PersonalTimeSettings({ settings, update }: { settings: any, upda
                             <Shield className="w-4 h-4 text-purple-500" />
                             Meeting Overlaps
                         </h4>
-                        <RadioGroup defaultValue={settings.conflictRule} onValueChange={setConflict} className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                        <RadioGroup value={settings.conflictRule} onValueChange={setConflict} className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                             <div>
                                 <RadioGroupItem value="never" id="never" className="peer sr-only" />
                                 <Label

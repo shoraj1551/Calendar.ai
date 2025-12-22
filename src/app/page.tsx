@@ -1,5 +1,5 @@
 import { auth } from "@/auth";
-import { LoginButton, DashboardButton, LogoutButton } from "@/components/home/auth-buttons";
+import { LoginButton, DashboardButton, LogoutButton, HeaderSignInButton } from "@/components/home/auth-buttons";
 import { ShieldCheck, Layers, Sparkles } from "lucide-react";
 
 export default async function Home() {
@@ -17,9 +17,7 @@ export default async function Home() {
           {session ? (
             <DashboardButton />
           ) : (
-            <button className="text-sm font-medium hover:underline text-gray-600 dark:text-gray-400">
-              Sign In
-            </button>
+            <HeaderSignInButton />
           )}
         </div>
       </header>

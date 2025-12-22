@@ -5,6 +5,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
+import { SettingsHeader } from "@/features/settings/components/settings-header";
 
 export function AppearanceSettings({ settings, update }: { settings: any, update: (k: string, v: any) => void }) {
     const setSetting = (key: string, val: string) => {
@@ -13,22 +14,18 @@ export function AppearanceSettings({ settings, update }: { settings: any, update
 
     return (
         <div className="space-y-8 animate-in fade-in duration-500">
-            <div>
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-2 mb-2">
-                    <Monitor className="w-5 h-5 text-gray-500" />
-                    Appearance & Basics
-                </h3>
-                <p className="text-sm text-gray-500">
-                    Customize your experience for maximum comfort.
-                </p>
-            </div>
+            <SettingsHeader
+                title="Appearance & Basics"
+                description="Customize your experience for maximum comfort."
+                icon={Monitor}
+            />
 
             <div className="grid gap-8">
 
                 {/* 1. Theme Selection - Minimal Cards */}
                 <div className="space-y-4">
                     <h4 className="font-medium text-sm text-gray-900 dark:text-gray-100 uppercase tracking-wider text-xs font-bold text-gray-400">Theme</h4>
-                    <RadioGroup defaultValue={settings.theme} onValueChange={(val) => setSetting('theme', val)} className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <RadioGroup value={settings.theme} onValueChange={(val) => setSetting('theme', val)} className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                         <div>
                             <RadioGroupItem value="light" id="theme-light" className="peer sr-only" />
                             <Label
@@ -117,6 +114,6 @@ export function AppearanceSettings({ settings, update }: { settings: any, update
                     </div>
                 </div>
             </div>
-        </div>
+        </div >
     );
 }

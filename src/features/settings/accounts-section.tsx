@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Cloud, RefreshCw, Trash2, Mail, MoreHorizontal, PauseCircle, PlayCircle, Plus, Info, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -23,6 +23,7 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { ConnectAccountModal } from "./components/connect-modal";
 
 interface CalendarSource {
     id: string;
@@ -38,75 +39,129 @@ interface CalendarSource {
 }
 
 export function AccountsSection() {
-    const [sources, setSources] = useState<CalendarSource[]>([
-        {
-            id: '1',
-            provider: 'exchange',
-            name: 'Corporate Exchange',
-            email: 'shoraj@work-corp.com',
-            status: 'active',
-            lastSynced: '2 mins ago',
-            color: 'bg-blue-500',
-            priority: 'work',
-            enabled: true
-        },
-        {
-            id: '2',
-            provider: 'google',
-            name: 'Personal Gmail',
-            email: 'shoraj.tomer@gmail.com',
-            status: 'paused',
-            lastSynced: '1 hour ago',
-            color: 'bg-green-500',
-            priority: 'personal',
-            enabled: true,
-            isPrimary: true
-        },
-        {
-            id: '3',
-            provider: 'outlook',
-            name: 'Freelance Projects',
-            email: 'projects@studio.com',
-            status: 'error',
-            lastSynced: 'Failed 1d ago',
-            color: 'bg-purple-500',
-            priority: 'optional',
-            enabled: false
+    const [sources, setSources] = useState<CalendarSource[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    // Helper to enrich DB data with UI defaults
+    const mapAccountData = (account: any): CalendarSource => ({
+        ...account,
+        // Default UI properties if missing from DB
+        color: account.provider === 'google' ? 'bg-green-500' :
+            account.provider === 'outlook' ? 'bg-blue-500' :
+                account.provider === 'ical' ? 'bg-gray-500' : 'bg-indigo-500',
+        priority: account.priority || 'personal',
+        lastSynced: account.lastSynced || 'Just now', // optimize later
+        enabled: account.status === 'active'
+    });
+
+    const fetchAccounts = async () => {
+        try {
+            const res = await fetch("/api/accounts");
+            if (res.ok) {
+                const data = await res.json();
+                setSources(data.accounts.map(mapAccountData));
+            }
+        } catch (error) {
+            console.error("Failed to fetch accounts", error);
+        } finally {
+            setLoading(false);
         }
-    ]);
+    };
+
+    useEffect(() => {
+        fetchAccounts();
+    }, []);
 
     const [sourceToDelete, setSourceToDelete] = useState<string | null>(null);
 
-    const toggleSource = (id: string, currentEnabled: boolean) => {
-        // If enabling, no confirmation needed (or could ask for re-auth)
-        if (!currentEnabled) {
-            setSources(prev => prev.map(s => s.id === id ? { ...s, enabled: true } : s));
-            toast.success("Calendar enabled");
-            return;
-        }
+    const toggleSource = async (id: string, currentEnabled: boolean) => {
+        // Optimistic Update
+        const newStatus = currentEnabled ? 'paused' : 'active';
+        setSources(prev => prev.map(s => s.id === id ? { ...s, status: newStatus as any, enabled: !currentEnabled } : s));
 
-        // If disabling, explain impact
-        // For simplicity using a toast/confirmation here, but could be a modal if strictly enforced
-        setSources(prev => prev.map(s => s.id === id ? { ...s, enabled: false } : s));
-        toast.info("Calendar disabled. Events from this source will be hidden.");
+        try {
+            await fetch("/api/accounts", {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ id, status: newStatus })
+            });
+            // Background sync could be triggered here if we wanted to be robust
+        } catch (error) {
+            toast.error("Failed to update status");
+            // Revert
+            setSources(prev => prev.map(s => s.id === id ? { ...s, status: currentEnabled ? 'active' : 'paused' as any, enabled: currentEnabled } : s));
+        }
     };
 
     const togglePause = (id: string) => {
-        setSources(prev => prev.map(s => s.id === id ? {
-            ...s,
-            status: s.status === 'paused' ? 'active' : 'paused'
-        } : s));
+        const source = sources.find(s => s.id === id);
+        if (source) toggleSource(id, source.enabled);
     };
 
     const handleDeleteClick = (id: string) => {
         setSourceToDelete(id);
     };
 
-    const confirmDelete = () => {
-        if (sourceToDelete) {
-            setSources(prev => prev.filter(s => s.id !== sourceToDelete));
+    const confirmDelete = async () => {
+        if (!sourceToDelete) return;
+
+        try {
+            const res = await fetch(`/api/accounts?id=${sourceToDelete}`, { method: "DELETE" });
+            if (res.ok) {
+                setSources(prev => prev.filter(s => s.id !== sourceToDelete));
+                toast.success("Account removed successfully");
+            } else {
+                const data = await res.json();
+                toast.error(data.error || "Failed to remove account");
+            }
+        } catch (error) {
+            toast.error("Error removing account");
+        } finally {
             setSourceToDelete(null);
-            toast.success("Account removed successfully");
+        }
+    };
+
+
+    const [isAddingOpen, setIsAddingOpen] = useState(false);
+    const [selectedProvider, setSelectedProvider] = useState<CalendarSource['provider'] | null>(null);
+
+    const handleAddAccountClick = (provider: CalendarSource['provider']) => {
+        setIsAddingOpen(false);
+        setSelectedProvider(provider);
+    };
+
+    const handleConnect = async (email: string) => {
+        if (!selectedProvider) return;
+
+        try {
+            // 1. Get Auth URL from Backend
+            const res = await fetch("/api/integrations/auth-url", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    provider: selectedProvider,
+                    email
+                }),
+            });
+
+            if (!res.ok) {
+                const err = await res.json();
+                throw new Error(err.error || "Failed to initiate connection");
+            }
+
+            const { url } = await res.json();
+
+            // 2. Redirect to Provider
+            // Currently simulated/mocked if keys are missing, or real if keys present
+            // If the URL is just a string message (e.g. "Simulated..."), we treat it as an error or handle it?
+            // The backend returns a real URL or throws.
+
+            window.location.href = url;
+
+        } catch (error: any) {
+            toast.error(error.message);
+            // Don't close modal so user can retry
+            throw error;
         }
     };
 
@@ -148,8 +203,10 @@ export function AccountsSection() {
                                 </div>
                             </div>
                         </div>
-                        <Button variant="outline" size="sm" className="hidden sm:flex">
-                            Manage Profile
+                        <Button variant="outline" size="sm" className="hidden sm:flex" asChild>
+                            <a href="https://myaccount.google.com/" target="_blank" rel="noopener noreferrer">
+                                Manage Profile
+                            </a>
                         </Button>
                     </div>
                 </div>
@@ -158,7 +215,12 @@ export function AccountsSection() {
                 <div className="space-y-3">
                     <div className="flex items-center justify-between px-1">
                         <h4 className="text-sm font-medium text-gray-500 uppercase tracking-wider">Connected Calendars</h4>
-                        <Button variant="ghost" size="sm" className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 h-8 gap-1.5">
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 h-8 gap-1.5"
+                            onClick={() => setIsAddingOpen(true)}
+                        >
                             <Plus className="w-4 h-4" />
                             Connect New
                         </Button>
@@ -296,6 +358,66 @@ export function AccountsSection() {
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
+
+            {/* Add Account Selection Dialog */}
+            <AlertDialog open={isAddingOpen} onOpenChange={setIsAddingOpen}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Connect a new calendar</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            Select a provider to connect. We'll sync your events and look for conflicts.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <div className="grid grid-cols-1 gap-2 py-4">
+                        <Button variant="outline" className="justify-start h-12 gap-3" onClick={() => handleAddAccountClick('google')}>
+                            <Cloud className="w-4 h-4 text-green-500" />
+                            Google Calendar
+                        </Button>
+                        <Button variant="outline" className="justify-start h-12 gap-3" onClick={() => handleAddAccountClick('outlook')}>
+                            <Mail className="w-4 h-4 text-blue-500" />
+                            Outlook / Office 365
+                        </Button>
+                        <Button variant="outline" className="justify-start h-12 gap-3" onClick={() => handleAddAccountClick('ical')}>
+                            <CalendarSourceIcon className="w-4 h-4 text-gray-500" />
+                            iCloud / WebCal
+                        </Button>
+                    </div>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+
+            {/* Email Prompt Modal */}
+            <ConnectAccountModal
+                isOpen={!!selectedProvider}
+                onClose={() => setSelectedProvider(null)}
+                provider={selectedProvider as any}
+                onConnect={handleConnect}
+            />
         </div>
     );
+}
+
+// Helper icon
+function CalendarSourceIcon(props: any) {
+    return (
+        <svg
+            {...props}
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+        >
+            <rect width="18" height="18" x="3" y="4" rx="2" ry="2" />
+            <line x1="16" x2="16" y1="2" y2="6" />
+            <line x1="8" x2="8" y1="2" y2="6" />
+            <line x1="3" x2="21" y1="10" y2="10" />
+        </svg>
+    )
 }

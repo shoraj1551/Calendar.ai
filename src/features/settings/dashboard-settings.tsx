@@ -4,6 +4,7 @@ import { useState } from "react";
 import { LayoutDashboard, BarChart3, PieChart, TrendingUp, EyeOff } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
+import { SettingsHeader } from "@/features/settings/components/settings-header";
 
 export function DashboardSettings({ settings, update }: { settings: any, update: (k: string, v: any) => void }) {
     const toggle = (key: string) => {
@@ -11,11 +12,12 @@ export function DashboardSettings({ settings, update }: { settings: any, update:
     };
 
     return (
-        <div className="space-y-8">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-2">
-                <LayoutDashboard className="w-4 h-4 text-pink-500" />
-                Dashboard & Insights
-            </h3>
+        <div className="space-y-8 animate-in fade-in duration-500">
+            <SettingsHeader
+                title="Dashboard & Insights"
+                description="Customize what you see on your daily command center."
+                icon={LayoutDashboard}
+            />
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 {/* Visual Preview */}

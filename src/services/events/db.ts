@@ -28,7 +28,8 @@ export const EventRepository = {
             endTime: data.end || new Date(),
             allDay: data.allDay || false,
             location: data.location,
-            type: (data.type as "work" | "personal") || "work",
+            type: (data.type as any) || "work",
+            isUrgent: data.isUrgent || false,
             provider: "local",
         }).returning();
 
@@ -53,8 +54,9 @@ export const EventRepository = {
             end: e.endTime,
             allDay: e.allDay || false,
             provider: "local" as const,
-            type: (e.type as "work" | "personal") || "work",
+            type: (e.type as any) || "work",
             status: "confirmed" as const,
+            isUrgent: e.isUrgent || false,
             description: e.description || undefined,
             location: e.location || undefined,
         }));
@@ -68,7 +70,7 @@ export const EventRepository = {
             endTime: data.end,
             allDay: data.allDay,
             location: data.location,
-            type: data.type,
+            type: data.type as any,
         }).where(eq(events.id, id)).returning();
         return updatedEvent;
     },

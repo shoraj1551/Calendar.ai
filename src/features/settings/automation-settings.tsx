@@ -3,6 +3,7 @@
 import { Cpu, MessageSquare, CalendarClock, ListTodo, Zap, BrainCircuit } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
+import { SettingsHeader } from "@/features/settings/components/settings-header";
 
 interface AutomationSettingsProps {
     settings: any;
@@ -17,18 +18,11 @@ export function AutomationSettings({ settings, update }: AutomationSettingsProps
 
     return (
         <div className="space-y-8 animate-in fade-in duration-500">
-            <div>
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-2 mb-2">
-                    <Cpu className="w-5 h-5 text-purple-500" />
-                    Automation & AI Controls
-                </h3>
-                <p className="text-sm text-gray-500 max-w-2xl">
-                    Control how proactive the assistant is. You can enable or disable specific capabilities to match your comfort level.
-                    <span className="block mt-1 font-medium text-purple-600 dark:text-purple-400">
-                        No hidden actions. You see exactly what the AI is allowed to do.
-                    </span>
-                </p>
-            </div>
+            <SettingsHeader
+                title="Automation & Capabilities"
+                description="Control how proactive the assistant is. You see exactly what the AI is allowed to do."
+                icon={Cpu}
+            />
 
             <div className="grid gap-6">
 
@@ -133,6 +127,6 @@ export function AutomationSettings({ settings, update }: AutomationSettingsProps
                 </div>
 
             </div>
-        </div>
+        </div >
     );
 }

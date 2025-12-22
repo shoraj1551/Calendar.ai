@@ -17,6 +17,7 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { SettingsHeader } from "@/features/settings/components/settings-header";
 
 export function MeetingPrivacySettings({ settings, update }: { settings: any, update: (k: string, v: any) => void }) {
     const [recordings, setRecordings] = useState([
@@ -39,18 +40,11 @@ export function MeetingPrivacySettings({ settings, update }: { settings: any, up
 
     return (
         <div className="space-y-8 animate-in fade-in duration-500">
-            <div>
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-2 mb-2">
-                    <Lock className="w-5 h-5 text-indigo-500" />
-                    Meeting Intelligence & Privacy
-                </h3>
-                <p className="text-sm text-gray-500 max-w-2xl">
-                    Strict controls over how the AI listens and learns.
-                    <span className="block mt-1 font-medium text-indigo-600 dark:text-indigo-400">
-                        We prioritize your privacy. Recording features are OFF by default.
-                    </span>
-                </p>
-            </div>
+            <SettingsHeader
+                title="Meeting Intelligence & Privacy"
+                description="Strict controls over how the AI listens and learns. Recording features are OFF by default."
+                icon={Lock}
+            />
 
             {/* Privacy Controls */}
             <div className="grid gap-6">

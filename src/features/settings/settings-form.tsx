@@ -3,13 +3,14 @@
 import { useState, useEffect, useCallback } from "react";
 import { toast } from "sonner";
 import { getSettings, updateSettings } from "@/actions/settings";
+import { Menu } from "lucide-react";
 
-// New Layout Components
+// Components
 import { SettingsSidebar } from "@/features/settings/settings-sidebar";
 import { SettingsHome } from "@/features/settings/settings-home";
 import { GlobalKillSwitch } from "@/features/settings/global-kill-switch";
 
-// Section Components
+// Sections
 import { AccountsSection } from "@/features/settings/accounts-section";
 import { CommunicationSettings } from "@/features/settings/communication-settings";
 import { PersonalTimeSettings } from "@/features/settings/personal-time-settings";
@@ -20,63 +21,57 @@ import { DashboardSettings } from "@/features/settings/dashboard-settings";
 import { AppearanceSettings } from "@/features/settings/appearance-settings";
 import { SecurityDataSettings } from "@/features/settings/security-data-settings";
 import { AutomationSettings } from "@/features/settings/automation-settings";
+import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
 const DEFAULT_SETTINGS = {
     // Communication
     dailySummary: true,
     weeklyInsights: true,
     urgentOnly: false,
-    commChannel: 'email', // Default to email as push is "OFF initially"
-    quietHours: true, // 10 PM – 8 AM
+    commChannel: 'email',
+    quietHours: true,
     quietStart: '22:00',
     quietEnd: '08:00',
-
     // Personal Time
     lunch: true,
     breaks: true,
-    exercise: false, // Not specified in table, keeping default
-    focusTime: true, // "Focus time auto-block: ON"
-    conflictRule: 'ask', // "Allow meetings over personal time: Ask me"
-
+    exercise: false,
+    focusTime: true,
+    conflictRule: 'ask',
     // Privacy
-    allowRecording: false, // "Recording: OFF"
+    allowRecording: false,
     autoTranscribe: true,
-    autoSummarize: false, // "AI summaries: OFF"
-    alwaysAsk: true, // Implied by philosophy
-    joinBot: false, // "Join as Assistant"
-    meetingRecording: false, // "Recording: OFF"
-    transcribe: false, // "Transcription: OFF"
-
+    autoSummarize: false,
+    alwaysAsk: true,
+    joinBot: false,
+    meetingRecording: false,
+    transcribe: false,
     // Accountability
-    tone: 'gentle', // "Reminder tone: Gentle"
-    allowEscalation: true, // "Escalation: ON"
-    missedTaskLogic: 'ask', // "Missed-task behavior: Ask"
-
+    tone: 'gentle',
+    allowEscalation: true,
+    missedTaskLogic: 'ask',
     // Focus
     focusDuration: [45],
-    silenceNotifications: true, // "Silence notifications: ON"
+    silenceNotifications: true,
     blockMeetings: false,
     breakReminders: true,
-
     // Dashboard
-    showScore: false, // "Productivity score: OFF"
-    showCategories: true, // "Time usage breakdown: ON"
-    showTrends: true, // "Weekly trend view: ON"
-
+    showScore: false,
+    showCategories: true,
+    showTrends: true,
     // Appearance
-    theme: 'system', // "Theme: System default"
+    theme: 'system',
     fontSize: 'medium',
-    weekStart: 'monday', // "Based on locale" (Defaulting to Monday)
-    timeFormat: '24', // "Based on locale"
-
-    // General / Automation
+    weekStart: 'monday',
+    timeFormat: '24',
+    // General
     workStart: "09:00",
     workEnd: "17:00",
-    prompts: true, // "Smart nudges: ON"
-    scheduling: true, // "Reschedule suggestions: ON"
-    briefing: true, // "Daily summary: ON"
-
-    // Global Kill Switch
+    prompts: true,
+    scheduling: true,
+    briefing: true,
+    // Kill Switch
     aiEnabled: true
 };
 
@@ -84,12 +79,12 @@ export function SettingsForm() {
     const [settings, setSettings] = useState(DEFAULT_SETTINGS);
     const [loading, setLoading] = useState(true);
     const [activeSection, setActiveSection] = useState("home");
+    const [isMobileOpen, setIsMobileOpen] = useState(false);
 
     useEffect(() => {
         const load = async () => {
             try {
                 const data = await getSettings();
-                // Merge data carefully so we respect defaults if keys are missing
                 setSettings(prev => ({ ...prev, ...data }));
             } catch (err) {
                 console.error("Failed to load settings", err);
@@ -109,83 +104,83 @@ export function SettingsForm() {
     }, []);
 
     const update = (key: string, val: any) => {
-        // 1. Optimistic update
         setSettings(prev => {
             const next = { ...prev, [key]: val };
-            // 2. Trigger save (asynchronously to avoid React "update during render" warning)
             setTimeout(() => save(next), 0);
             return next;
         });
     };
 
+    const handleNavigate = (section: string) => {
+        setActiveSection(section);
+        setIsMobileOpen(false);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
     const renderContent = () => {
         switch (activeSection) {
-            case "home":
-                return <SettingsHome onNavigate={setActiveSection} />;
-            case "accounts":
-                return <AccountsSection />;
-            case "communication":
-                return <CommunicationSettings settings={settings} update={update} />;
-            case "personal-time":
-                return <PersonalTimeSettings settings={settings} update={update} />;
-            case "meeting-privacy":
-                return <MeetingPrivacySettings settings={settings} update={update} />;
-            case "task-accountability":
-                return <TaskAccountabilitySettings settings={settings} update={update} />;
-            case "focus":
-                return <FocusSettings settings={settings} update={update} />;
-            case "dashboard":
-                return <DashboardSettings settings={settings} update={update} />;
-            case "appearance":
-                return <AppearanceSettings settings={settings} update={update} />;
-            case "security":
-                return <SecurityDataSettings />;
+            case "home": return <SettingsHome onNavigate={handleNavigate} />;
+            case "accounts": return <AccountsSection />;
+            case "communication": return <CommunicationSettings settings={settings} update={update} />;
+            case "personal-time": return <PersonalTimeSettings settings={settings} update={update} />;
+            case "meeting-privacy": return <MeetingPrivacySettings settings={settings} update={update} />;
+            case "task-accountability": return <TaskAccountabilitySettings settings={settings} update={update} />;
+            case "focus": return <FocusSettings settings={settings} update={update} />;
+            case "dashboard": return <DashboardSettings settings={settings} update={update} />;
+            case "appearance": return <AppearanceSettings settings={settings} update={update} />;
+            case "security": return <SecurityDataSettings />;
             case "automation":
                 return (
                     <div className="space-y-8 animate-in fade-in duration-500">
-                        <div className="space-y-6">
-                            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-6">Global Control</h3>
+                        <AutomationSettings settings={settings} update={update} />
+                        <div className="w-full h-px bg-gray-100 dark:bg-gray-800" />
+                        <div className="bg-red-50 dark:bg-red-900/10 border border-red-100 dark:border-red-900/20 rounded-xl p-6">
+                            <h3 className="text-lg font-semibold text-red-900 dark:text-red-100 mb-4">Danger Zone</h3>
                             <GlobalKillSwitch
                                 enabled={settings.aiEnabled !== false}
                                 onToggle={() => update('aiEnabled', !settings.aiEnabled)}
                             />
                         </div>
-                        <div className="w-full h-px bg-gray-100 dark:bg-gray-800" />
-                        <AutomationSettings settings={settings} update={update} />
                     </div>
                 );
-            default:
-                return <SettingsHome onNavigate={setActiveSection} />;
+            default: return <SettingsHome onNavigate={handleNavigate} />;
         }
     };
 
     if (loading) {
         return (
-            <div className="min-h-[600px] flex items-center justify-center">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+            <div className="min-h-[80vh] flex items-center justify-center">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-slate-900"></div>
             </div>
         );
     }
 
     return (
-        <div className="flex flex-col lg:flex-row min-h-[600px] gap-8">
-            {/* Sidebar Navigation - Desktop Only */}
-            <aside className="shrink-0 border-r border-gray-100 dark:border-gray-800 pr-0 lg:pr-8 hidden lg:block">
-                <SettingsSidebar activeSection={activeSection} onSelect={setActiveSection} />
+        <div className="flex flex-col lg:flex-row min-h-[calc(100vh-4rem)] gap-8">
+            {/* Mobile Sidebar Trigger */}
+            <div className="lg:hidden mb-4">
+                <Sheet open={isMobileOpen} onOpenChange={setIsMobileOpen}>
+                    <SheetTrigger asChild>
+                        <Button variant="outline" className="w-full justify-between">
+                            Menu
+                            <Menu className="w-4 h-4 ml-2" />
+                        </Button>
+                    </SheetTrigger>
+                    <SheetContent side="left" className="w-80 p-0 pt-6">
+                        <SettingsSidebar activeSection={activeSection} onSelect={handleNavigate} />
+                    </SheetContent>
+                </Sheet>
+            </div>
+
+            {/* Desktop Sidebar - Sticky */}
+            <aside className="hidden lg:block w-72 shrink-0">
+                <div className="sticky top-6">
+                    <SettingsSidebar activeSection={activeSection} onSelect={handleNavigate} />
+                </div>
             </aside>
 
-            {/* Main Content Area */}
-            <main className="flex-1 min-w-0">
-                {/* Mobile Header with Back Button */}
-                {activeSection !== "home" && (
-                    <div className="lg:hidden mb-6 flex items-center gap-2 text-gray-500 hover:text-gray-900 dark:hover:text-gray-100 cursor-pointer transition-colors" onClick={() => setActiveSection("home")}>
-                        <div className="p-1 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800">
-                            <span className="text-lg">←</span>
-                        </div>
-                        <span className="font-medium text-sm">Back to Settings</span>
-                    </div>
-                )}
-
+            {/* Main Content */}
+            <main className="flex-1 min-w-0 pb-16">
                 {renderContent()}
             </main>
         </div>

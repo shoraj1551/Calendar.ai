@@ -13,18 +13,26 @@ export const users = pgTable("users", {
 export const events = pgTable("events", {
     id: uuid("id").defaultRandom().primaryKey(),
     userId: uuid("user_id").references(() => users.id).notNull(),
+    connectedAccountId: uuid("connected_account_id").references(() => connectedAccounts.id), // Link to source account
     title: text("title").notNull(),
     description: text("description"),
     startTime: timestamp("start_time").notNull(),
     endTime: timestamp("end_time").notNull(),
     allDay: boolean("all_day").default(false),
     location: text("location"),
-    type: text("type", { enum: ["work", "personal"] }).default("work"),
+    type: text("type", { enum: ["work", "personal", "focus", "recovery", "social", "admin", "lunch", "holiday", "life_event"] }).default("work"),
     provider: text("provider").default("local"),
+    providerEventId: text("provider_event_id"),
+    status: text("status", { enum: ["confirmed", "tentative", "cancelled"] }).default("confirmed"),
+    isUrgent: boolean("is_urgent").default(false), // Soft Block override flag
+    htmlLink: text("html_link"),
+    organizer: jsonb("organizer"),
+    attendees: jsonb("attendees"),
     createdAt: timestamp("created_at").defaultNow(),
 }, (table) => {
     return {
         startTimeIdx: index("start_time_idx").on(table.startTime),
+        providerEventIdIdx: index("provider_event_id_idx").on(table.providerEventId),
     };
 });
 
@@ -98,5 +106,40 @@ export const notifications = pgTable("notifications", {
 export const userSettings = pgTable("user_settings", {
     userId: uuid("user_id").references(() => users.id).primaryKey(),
     preferences: jsonb("preferences").notNull().default({}),
+    ignoredHolidays: jsonb("ignored_holidays").default([]), // List of holiday IDs to ignore
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+export const connectedAccounts = pgTable("connected_accounts", {
+    id: uuid("id").defaultRandom().primaryKey(),
+    userId: uuid("user_id").references(() => users.id).notNull(),
+    provider: text("provider", { enum: ["google", "outlook", "exchange", "ical"] }).notNull(),
+    email: text("email").notNull(),
+    name: text("name"),
+    status: text("status", { enum: ["active", "paused", "error"] }).default("active").notNull(),
+    isPrimary: boolean("is_primary").default(false).notNull(),
+    accessToken: text("access_token"),
+    refreshToken: text("refresh_token"),
+    expiresAt: timestamp("expires_at"),
+    preferences: jsonb("preferences").notNull().default({}),
+    ignoredHolidays: jsonb("ignored_holidays").default([]), // List of holiday IDs to ignore
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+}, (table) => {
+    return {
+        userIdIdx: index("connected_accounts_user_id_idx").on(table.userId),
+    };
+});
+
+export const userEnergyZones = pgTable("user_energy_zones", {
+    id: uuid("id").defaultRandom().primaryKey(),
+    userId: uuid("user_id").references(() => users.id).notNull(),
+    dayOfWeek: text("day_of_week").notNull(), // "monday", ... "all"
+    startTime: text("start_time").notNull(), // "09:00"
+    endTime: text("end_time").notNull(), // "11:00"
+    energyLevel: text("energy_level", { enum: ["high", "medium", "low", "drain"] }).default("medium").notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+}, (table) => {
+    return {
+        userIdIdx: index("energy_zones_user_id_idx").on(table.userId),
+    };
 });

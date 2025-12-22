@@ -44,3 +44,14 @@ export function LogoutButton({ className, variant = "ghost" }: { className?: str
         </Button>
     );
 }
+
+export function HeaderSignInButton() {
+    return (
+        <button
+            onClick={() => signIn("google", { callbackUrl: "/dashboard" })}
+            className="text-sm font-medium hover:underline text-gray-600 dark:text-gray-400"
+        >
+            Sign In
+        </button>
+    );
+}

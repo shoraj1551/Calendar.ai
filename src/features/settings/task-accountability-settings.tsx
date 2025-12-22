@@ -5,6 +5,7 @@ import { Switch } from "@/components/ui/switch";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
+import { SettingsHeader } from "@/features/settings/components/settings-header";
 
 export function TaskAccountabilitySettings({ settings, update }: { settings: any, update: (k: string, v: any) => void }) {
     const setTone = (val: string) => {
@@ -20,11 +21,12 @@ export function TaskAccountabilitySettings({ settings, update }: { settings: any
     };
 
     return (
-        <div className="space-y-8">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-2">
-                <Activity className="w-4 h-4 text-pink-500" />
-                Task & Accountability
-            </h3>
+        <div className="space-y-8 animate-in fade-in duration-500">
+            <SettingsHeader
+                title="Task & Accountability"
+                description="Set the coaching tone and pressure level for your goals."
+                icon={Activity}
+            />
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 {/* Visual Preview / Tone */}
@@ -67,7 +69,7 @@ export function TaskAccountabilitySettings({ settings, update }: { settings: any
                     {/* Tone Selection */}
                     <div className="space-y-3">
                         <h4 className="font-medium text-sm text-gray-900 dark:text-gray-100">AI Personality</h4>
-                        <RadioGroup defaultValue={settings.tone} onValueChange={setTone} className="grid grid-cols-2 gap-4">
+                        <RadioGroup value={settings.tone} onValueChange={setTone} className="grid grid-cols-2 gap-4">
                             <div>
                                 <RadioGroupItem value="gentle" id="gentle" className="peer sr-only" />
                                 <Label
@@ -100,7 +102,7 @@ export function TaskAccountabilitySettings({ settings, update }: { settings: any
                             When I miss a task...
                         </h4>
 
-                        <RadioGroup defaultValue={settings.missedTaskLogic} onValueChange={setMissedLogic} className="space-y-2">
+                        <RadioGroup value={settings.missedTaskLogic} onValueChange={setMissedLogic} className="space-y-2">
                             <div className={cn("flex items-center space-x-3 border rounded-md p-3 transition-colors cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-900", settings.missedTaskLogic === 'rollover' ? "border-pink-500 bg-pink-50/50 dark:bg-pink-900/10" : "border-gray-200 dark:border-gray-800")}>
                                 <RadioGroupItem value="rollover" id="logic-rollover" />
                                 <Label htmlFor="logic-rollover" className="text-sm font-medium cursor-pointer flex-1 flex items-center justify-between">

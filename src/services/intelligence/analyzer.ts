@@ -2,24 +2,35 @@ import { UnifiedEvent } from "../calendar/types";
 import { DayMetrics } from "./types";
 import { startOfDay, differenceInMinutes, isSameDay, eachDayOfInterval } from "date-fns";
 
+// Define Settings Interface locally to avoid circular deps, or import if available
+interface AnalysisSettings {
+    workStart: string; // "09:00"
+    workEnd: string; // "17:00"
+    lunch?: boolean;
+}
+
 /**
  * analyzes a single day to calculate metrics.
  */
-const analyzeDay = (date: Date, events: UnifiedEvent[]): DayMetrics => {
+const analyzeDay = (date: Date, events: UnifiedEvent[], settings: AnalysisSettings): DayMetrics => {
     const dailyEvents = events.filter((e) => isSameDay(e.start, date)).sort((a, b) => a.start.getTime() - b.start.getTime());
 
     let totalMeetingMinutes = 0;
     let focusMinutes = 0;
     let longestFocusBlock = 0;
 
+    // Parse Settings
+    const [startH, startM] = settings.workStart.split(':').map(Number);
+    const [endH, endM] = settings.workEnd.split(':').map(Number);
+
     // 1. Calculate Meeting Time
     dailyEvents.forEach((e) => {
         totalMeetingMinutes += differenceInMinutes(e.end, e.start);
     });
 
-    // 2. Calculate Focus Time (Gaps > 30 mins between 9am - 5pm)
-    const dayStart = new Date(date); dayStart.setHours(9, 0, 0, 0);
-    const dayEnd = new Date(date); dayEnd.setHours(17, 0, 0, 0);
+    // 2. Calculate Focus Time
+    const dayStart = new Date(date); dayStart.setHours(startH, startM, 0, 0);
+    const dayEnd = new Date(date); dayEnd.setHours(endH, endM, 0, 0);
 
     let lastEndTime = dayStart;
 
@@ -48,10 +59,11 @@ const analyzeDay = (date: Date, events: UnifiedEvent[]): DayMetrics => {
     let hasLunch = false;
     let fragmentationScore = 0;
 
-    // Work hours for lunch/late calc
+    // Lunch Window: Assuming 11:30 - 14:30 standard window for "Lunch" detection
+    // Could eventually be configurable
     const lunchStart = new Date(date); lunchStart.setHours(11, 30, 0, 0);
     const lunchEnd = new Date(date); lunchEnd.setHours(14, 30, 0, 0);
-    const workEnd = new Date(date); workEnd.setHours(17, 0, 0, 0);
+    const workEnd = dayEnd; // Consistent with dayEnd above
 
     // Re-scan for new metrics
     lastEndTime = dayStart;
@@ -110,7 +122,7 @@ const analyzeDay = (date: Date, events: UnifiedEvent[]): DayMetrics => {
 /**
  * Analyzes a range of dates.
  */
-export const analyzeSchedule = (events: UnifiedEvent[], start: Date, end: Date): DayMetrics[] => {
+export const analyzeSchedule = (events: UnifiedEvent[], start: Date, end: Date, settings: AnalysisSettings = { workStart: "09:00", workEnd: "17:00" }): DayMetrics[] => {
     const days = eachDayOfInterval({ start, end });
-    return days.map((day) => analyzeDay(day, events));
+    return days.map((day) => analyzeDay(day, events, settings));
 };

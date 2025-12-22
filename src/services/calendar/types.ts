@@ -6,7 +6,8 @@ export interface UnifiedEvent {
     allDay: boolean;
     provider: "google" | "outlook" | "local";
     status: "confirmed" | "tentative" | "cancelled";
-    type: "work" | "personal"; // Derived from calendar source or heuristic
+    type: "work" | "personal" | "focus" | "recovery" | "social" | "admin" | "lunch" | "holiday" | "life_event" | "block"; // Derived from calendar source or heuristic
+    isUrgent?: boolean; // Override flag for soft blocks
     description?: string;
     location?: string;
     meetLink?: string; // e.g., Google Meet URL

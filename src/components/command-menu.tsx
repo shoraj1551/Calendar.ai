@@ -40,7 +40,12 @@ export function CommandMenu() {
 
     const handleConnectCalendar = () => {
         setOpen(false);
-        router.push("/integrations"); // Assuming this is the intended route for calendar integration
+        router.push("/settings");
+    };
+
+    const handleNavigate = (path: string) => {
+        setOpen(false);
+        router.push(path);
     };
 
     const handleAskAI = async () => {
@@ -53,10 +58,6 @@ export function CommandMenu() {
         if (result.success && result.data) {
             const { intent, params, confirmationParams } = result.data;
             if (intent === "create_event" && params) {
-                // Determine start/end from params or defaults
-                // Params from AI are strings, need to verify
-                // Real app would show a "Confirm" dialog here.
-                // For now, auto-create.
                 try {
                     const response = await fetch("/api/calendar/events", {
                         method: "POST",
@@ -65,13 +66,16 @@ export function CommandMenu() {
                     });
                     if (response.ok) {
                         alert(`Success! Created event: ${(params as any).title}`);
-                        window.location.reload(); // Quick dirty refresh
+                        window.location.reload();
                     } else {
                         alert("Failed to save event.");
                     }
                 } catch (e) {
                     alert("Error saving event.");
                 }
+            } else if (intent === "query_schedule") {
+                const answer = (params as any)?.response || confirmationParams?.message || "I found the info, but couldn't format the answer.";
+                alert(answer);
             } else {
                 alert(`AI Intent: ${intent}\n${confirmationParams?.message || "Processed."}`);
             }
@@ -101,30 +105,21 @@ export function CommandMenu() {
                     <CommandGroup heading="Suggestions">
                         <CommandItem onSelect={handleConnectCalendar}>
                             <Calendar className="mr-2 h-4 w-4" />
-                            <span>Calendar</span>
+                            <span>Connect Calendar</span>
                         </CommandItem>
-                        <CommandItem>
-                            <Smile className="mr-2 h-4 w-4" />
-                            <span>Search Emoji</span>
-                        </CommandItem>
-                        <CommandItem>
-                            <Calculator className="mr-2 h-4 w-4" />
-                            <span>Calculator</span>
+                        <CommandItem onSelect={() => handleNavigate('/')}>
+                            <Calendar className="mr-2 h-4 w-4" />
+                            <span>Go to Calendar</span>
                         </CommandItem>
                     </CommandGroup>
                     <CommandSeparator />
                     <CommandGroup heading="Settings">
-                        <CommandItem>
+                        <CommandItem onSelect={() => handleNavigate('/settings')}>
                             <User className="mr-2 h-4 w-4" />
                             <span>Profile</span>
                             <CommandShortcut>⌘P</CommandShortcut>
                         </CommandItem>
-                        <CommandItem>
-                            <CreditCard className="mr-2 h-4 w-4" />
-                            <span>Billing</span>
-                            <CommandShortcut>⌘B</CommandShortcut>
-                        </CommandItem>
-                        <CommandItem>
+                        <CommandItem onSelect={() => handleNavigate('/settings')}>
                             <Settings className="mr-2 h-4 w-4" />
                             <span>Settings</span>
                             <CommandShortcut>⌘S</CommandShortcut>
@@ -141,4 +136,5 @@ export function CommandMenu() {
             </CommandDialog>
         </>
     );
+
 }

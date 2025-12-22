@@ -5,6 +5,7 @@ import { addMonths, subMonths, addWeeks, subWeeks, addDays, subDays } from "date
 import { CalendarHeader, type CalendarViewType } from "./calendar-header";
 import { MonthView } from "./month-view";
 import { WeekView } from "./week-view";
+import { DayView } from "./day-view";
 import { useCalendarEvents } from "../hooks/use-calendar-events";
 
 export function CalendarView() {
@@ -42,7 +43,10 @@ export function CalendarView() {
                 )}
                 {view === "week" && (
                     <WeekView currentDate={currentDate} events={events} />
-                )}    {view === "day" && <div className="flex items-center justify-center h-full text-muted-foreground">Day View Coming Soon</div>}
+                )}
+                {view === "day" && (
+                    <DayView currentDate={currentDate} events={events} />
+                )}
             </div>
         </div>
     );
