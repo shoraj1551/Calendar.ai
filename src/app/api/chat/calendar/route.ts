@@ -1,8 +1,3 @@
-import { streamText } from 'ai';
-import { openai } from '@ai-sdk/openai';
-import { NextRequest } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/auth';
 import { CalendarContextBuilder } from '@/services/llm/context';
 import { auth } from '@/auth';
 
@@ -34,17 +29,38 @@ Guidelines:
 
 Answer the user's question based on this calendar data.`;
 
-        const result = await streamText({
-            model: openai('gpt-4-turbo'),
-            messages: [
-                { role: 'system', content: systemPrompt },
-                ...messages,
-            ],
-            temperature: 0.7,
-            maxTokens: 500,
+        // Use OpenRouter API directly
+        const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`,
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                model: process.env.OPENROUTER_MODEL || 'anthropic/claude-3.5-sonnet',
+                messages: [
+                    { role: 'system', content: systemPrompt },
+                    ...messages,
+                ],
+                temperature: 0.7,
+                max_tokens: 500,
+            }),
         });
 
-        return result.toDataStreamResponse();
+        if (!response.ok) {
+            throw new Error(`OpenRouter API error: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        const assistantMessage = data.choices[0]?.message?.content || 'Sorry, I could not generate a response.';
+
+        return new Response(
+            JSON.stringify({ message: assistantMessage }),
+            {
+                status: 200,
+                headers: { 'Content-Type': 'application/json' }
+            }
+        );
     } catch (error: any) {
         console.error('[Chat API] Error:', error);
         return new Response(
@@ -53,4 +69,3 @@ Answer the user's question based on this calendar data.`;
         );
     }
 }
-
