@@ -25,7 +25,7 @@ export async function getUserSettingsAction() {
 }
 
 export async function saveUserSettingsAction(data: {
-    defaultView?: string;
+    defaultView?: 'day' | 'week' | 'month';
     workingHoursStart?: number;
     workingHoursEnd?: number;
     showWeekends?: boolean;
@@ -42,12 +42,22 @@ export async function saveUserSettingsAction(data: {
         await db.insert(userSettings)
             .values({
                 userId: session.user.id,
-                ...data,
+                defaultView: data.defaultView || 'week',
+                workingHoursStart: data.workingHoursStart,
+                workingHoursEnd: data.workingHoursEnd,
+                showWeekends: data.showWeekends,
+                firstDayOfWeek: data.firstDayOfWeek,
+                timezone: data.timezone,
             })
             .onConflictDoUpdate({
                 target: userSettings.userId,
                 set: {
-                    ...data,
+                    defaultView: data.defaultView,
+                    workingHoursStart: data.workingHoursStart,
+                    workingHoursEnd: data.workingHoursEnd,
+                    showWeekends: data.showWeekends,
+                    firstDayOfWeek: data.firstDayOfWeek,
+                    timezone: data.timezone,
                     updatedAt: new Date(),
                 },
             });

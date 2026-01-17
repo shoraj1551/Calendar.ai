@@ -2,11 +2,11 @@
 
 import { auth } from "@/auth";
 import { db } from "@/db";
-import { userSettings, users } from "@/db/schema"; // Added users
+import { userSettings, users } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 
-// Helper to ensure user exists (mirroring EventRepository logic)
+// Helper to ensure user exists
 async function ensureUser(email: string) {
     const user = await db.query.users.findFirst({ where: eq(users.email, email) });
     if (user) return user.id;
@@ -22,22 +22,67 @@ export async function getSettings() {
     const session = await auth();
 
     if (!session?.user?.email) {
-        // For development/demo purposes, return empty (defaults) instead of blocking
         console.warn("getSettings: No session email found, returning defaults");
-        return {};
+        return {
+            defaultView: "week",
+            workingHoursStart: 9,
+            workingHoursEnd: 17,
+            showWeekends: true,
+            firstDayOfWeek: 0,
+            emailNotifications: true,
+            browserNotifications: true,
+            reminderMinutes: 15,
+            timezone: "UTC",
+        };
     }
 
     try {
         const userId = await ensureUser(session.user.email);
         const settings = await db.select().from(userSettings).where(eq(userSettings.userId, userId));
-        return settings[0]?.preferences || {};
+
+        if (!settings[0]) {
+            // Return defaults if no settings exist
+            return {
+                defaultView: "week",
+                workingHoursStart: 9,
+                workingHoursEnd: 17,
+                showWeekends: true,
+                firstDayOfWeek: 0,
+                emailNotifications: true,
+                browserNotifications: true,
+                reminderMinutes: 15,
+                timezone: "UTC",
+            };
+        }
+
+        return {
+            defaultView: settings[0].defaultView,
+            workingHoursStart: settings[0].workingHoursStart,
+            workingHoursEnd: settings[0].workingHoursEnd,
+            showWeekends: settings[0].showWeekends,
+            firstDayOfWeek: settings[0].firstDayOfWeek,
+            emailNotifications: settings[0].emailNotifications,
+            browserNotifications: settings[0].browserNotifications,
+            reminderMinutes: settings[0].reminderMinutes,
+            timezone: settings[0].timezone,
+        };
     } catch (error) {
         console.error("getSettings Error:", error);
-        return {};
+        return {
+            defaultView: "week",
+            workingHoursStart: 9,
+            workingHoursEnd: 17,
+            showWeekends: true,
+            firstDayOfWeek: 0,
+            emailNotifications: true,
+            browserNotifications: true,
+            reminderMinutes: 15,
+            timezone: "UTC",
+        };
     }
 }
 
-export async function updateSettings(newPreferences: Record<string, any>) {
+export async function updateSettings(newSettings: any) {
     const session = await auth();
 
     if (!session?.user?.email) {
@@ -51,12 +96,28 @@ export async function updateSettings(newPreferences: Record<string, any>) {
         // Upsert logic
         await db.insert(userSettings).values({
             userId: userId,
-            preferences: newPreferences,
+            defaultView: newSettings.defaultView || "week",
+            workingHoursStart: newSettings.workingHoursStart || 9,
+            workingHoursEnd: newSettings.workingHoursEnd || 17,
+            showWeekends: newSettings.showWeekends !== undefined ? newSettings.showWeekends : true,
+            firstDayOfWeek: newSettings.firstDayOfWeek || 0,
+            emailNotifications: newSettings.emailNotifications !== undefined ? newSettings.emailNotifications : true,
+            browserNotifications: newSettings.browserNotifications !== undefined ? newSettings.browserNotifications : true,
+            reminderMinutes: newSettings.reminderMinutes || 15,
+            timezone: newSettings.timezone || "UTC",
             updatedAt: new Date(),
         }).onConflictDoUpdate({
             target: userSettings.userId,
             set: {
-                preferences: newPreferences,
+                defaultView: newSettings.defaultView,
+                workingHoursStart: newSettings.workingHoursStart,
+                workingHoursEnd: newSettings.workingHoursEnd,
+                showWeekends: newSettings.showWeekends,
+                firstDayOfWeek: newSettings.firstDayOfWeek,
+                emailNotifications: newSettings.emailNotifications,
+                browserNotifications: newSettings.browserNotifications,
+                reminderMinutes: newSettings.reminderMinutes,
+                timezone: newSettings.timezone,
                 updatedAt: new Date(),
             }
         });
