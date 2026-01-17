@@ -46,7 +46,7 @@ export const getAggregatedEvents = async (accessToken: string, userId: string): 
     });
 
     const settingsRec = await db.select().from(userSettings).where(eq(userSettings.userId, userId));
-    const prefs = settingsRec[0]?.preferences as any || {};
+    const prefs = settingsRec[0] || {};
 
     const activeAccountIds = activeAccounts.map(a => a.id);
 

@@ -30,7 +30,7 @@ export class CommunicationService {
     private static async getSettings(userId: string) {
         const settings = await db.select().from(userSettings).where(eq(userSettings.userId, userId));
         // Return default if not set, mirroring frontend defaults
-        return settings[0]?.preferences || {
+        return settings[0] || {
             dailySummary: true,
             weeklyInsights: true,
             urgentOnly: false,

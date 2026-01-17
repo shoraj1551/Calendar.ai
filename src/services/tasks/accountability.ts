@@ -10,7 +10,7 @@ export class AccountabilityService {
     static async runCheck(userId: string) {
         // 1. Get Settings
         const settingsRec = await db.select().from(userSettings).where(eq(userSettings.userId, userId));
-        const prefs = settingsRec[0]?.preferences as any || {};
+        const prefs = settingsRec[0] || {};
 
         // Settings: { accountabilityMode: 'gentle' | 'strict', enableCheckins: boolean }
         const mode = prefs.accountabilityMode || 'gentle'; // Default to gentle

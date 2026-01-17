@@ -8,7 +8,7 @@ export class MeetingService {
     // Helper: Get Settings
     private static async getSettings(userId: string) {
         const settings = await db.select().from(userSettings).where(eq(userSettings.userId, userId));
-        return settings[0]?.preferences || {};
+        return settings[0] || {};
     }
 
     /**

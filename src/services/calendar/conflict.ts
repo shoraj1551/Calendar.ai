@@ -22,7 +22,7 @@ export const ConflictService = {
     async validateEventTime(userId: string, start: Date, end: Date, isUrgent: boolean = false): Promise<ValidationResult> {
         // 1. Fetch User Preferences
         const settingsRec = await db.select().from(userSettings).where(eq(userSettings.userId, userId));
-        const prefs = settingsRec[0]?.preferences as any || {};
+        const prefs = settingsRec[0] || {};
         const ignoredHolidays = (settingsRec[0]?.ignoredHolidays as string[]) || [];
 
         // 2. Generate Synthetic Blocks (Holidays/Lunch)

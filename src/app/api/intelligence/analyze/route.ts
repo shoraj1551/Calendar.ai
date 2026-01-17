@@ -26,7 +26,7 @@ export async function POST(req: Request) {
 
         // 2. Fetch User Settings
         const settingsRecord = await db.select().from(userSettings).where(eq(userSettings.userId, userId));
-        const prefs = settingsRecord[0]?.preferences as any || {};
+        const prefs = settingsRecord[0] || {};
 
         const analysisSettings = {
             workStart: prefs.workStart || "09:00",
