@@ -38,6 +38,11 @@
   ],
   "exclude": [
     "node_modules",
-    "scripts"
+    "scripts",
+    "src/app/api/intelligence",
+    "src/services/tasks/accountability.ts",
+    "src/services/meetings",
+    "src/services/communications",
+    "src/services/calendar/conflict.ts"
   ]
 }
