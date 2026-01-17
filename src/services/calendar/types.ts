@@ -3,14 +3,16 @@ export interface UnifiedEvent {
     title: string;
     start: Date;
     end: Date;
-    allDay: boolean;
-    provider: "google" | "outlook" | "local";
-    status: "confirmed" | "tentative" | "cancelled";
-    type: "work" | "personal" | "focus" | "recovery" | "social" | "admin" | "lunch" | "holiday" | "life_event" | "block"; // Derived from calendar source or heuristic
+    allDay?: boolean;
+    provider?: "local" | "google" | "outlook";
+    status?: "confirmed" | "tentative" | "cancelled";
+    type?: "work" | "personal" | "break" | "lunch" | "holiday";
     isUrgent?: boolean; // Override flag for soft blocks
     description?: string;
     location?: string;
     meetLink?: string; // e.g., Google Meet URL
+    connectedAccountId?: string | null;  // Added for calendar account tracking
+    providerEventId?: string | null;     // Added for provider event ID
 }
 
 export interface CalendarSource {
