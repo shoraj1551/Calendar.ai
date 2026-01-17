@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
-import { Calendar, Clock, MapPin, Users, Mail } from "lucide-react";
+import { Calendar, Clock, MapPin, Users, Mail, FileText, MessageSquare } from "lucide-react";
 import { UnifiedEvent } from "@/services/calendar/types";
 import { format } from "date-fns";
 import { generateRescheduleRequestAction } from "@/app/actions/calendar";
@@ -19,6 +19,7 @@ interface EventDetailPopoverProps {
 
 export function EventDetailPopover({ event, children }: EventDetailPopoverProps) {
     const [isRescheduleOpen, setIsRescheduleOpen] = useState(false);
+    const [notesOpen, setNotesOpen] = useState(false);
     const [emailDraft, setEmailDraft] = useState<any>(null);
     const [alternatives, setAlternatives] = useState<any[]>([]);
     const { data: session } = useSession();
@@ -111,7 +112,7 @@ export function EventDetailPopover({ event, children }: EventDetailPopoverProps)
                                     variant="outline"
                                     size="sm"
                                     className="flex-1"
-                                    onClick={() => setRescheduleOpen(true)}
+                                    onClick={() => setIsRescheduleOpen(true)}
                                 >
                                     <MessageSquare className="h-4 w-4 mr-2" />
                                     Reschedule
@@ -123,15 +124,22 @@ export function EventDetailPopover({ event, children }: EventDetailPopoverProps)
             </Popover>
 
             <RescheduleDialog
-                open={rescheduleOpen}
-                onOpenChange={setRescheduleOpen}
-                event={event}
+                isOpen={isRescheduleOpen}
+                onClose={() => setIsRescheduleOpen(false)}
+                eventTitle={event.title}
+                emailDraft={emailDraft}
+                alternatives={alternatives}
             />
 
             <MeetingNotesModal
                 open={notesOpen}
                 onOpenChange={setNotesOpen}
-                event={event}
+                event={{
+                    id: event.id,
+                    title: event.title,
+                    startTime: event.start,
+                    endTime: event.end
+                }}
             />
         </>
     );
