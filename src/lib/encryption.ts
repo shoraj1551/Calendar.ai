@@ -1,9 +1,17 @@
 import { createCipheriv, createDecipheriv, randomBytes } from "crypto";
 
 const ALGORITHM = "aes-256-cbc";
-// MVP: Ensure this is 32 chars. In prod, use process.env.ENCRYPTION_KEY
-const KEY = process.env.ENCRYPTION_KEY || "12345678901234567890123456789012";
+// CRITICAL: Encryption key MUST be set in production
+const KEY = process.env.ENCRYPTION_KEY;
+if (!KEY) {
+    throw new Error('ENCRYPTION_KEY environment variable must be set');
+}
+if (KEY.length !== 32) {
+    throw new Error('ENCRYPTION_KEY must be exactly 32 characters');
+}
+
 const IV_LENGTH = 16;
+
 
 export const EncryptionUtils = {
     encrypt(text: string): string {

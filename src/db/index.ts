@@ -12,9 +12,13 @@ console.log(`[DB] Connecting...`);
 const finalConnectionString = connectionString;
 
 export const client = postgres(finalConnectionString, {
+    max: 10, // Connection pool size - critical for Vercel serverless
+    idle_timeout: 20, // Close idle connections after 20 seconds
     prepare: false,
     connect_timeout: 10,
     onnotice: () => { },
-    ssl: finalConnectionString.includes("localhost") ? false : { rejectUnauthorized: false } // Disable SSL for local
+    ssl: process.env.NODE_ENV === 'production'
+        ? { rejectUnauthorized: true } // Verify SSL certificates in production
+        : finalConnectionString.includes("localhost") ? false : { rejectUnauthorized: false }
 });
 export const db = drizzle(client, { schema });

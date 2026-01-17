@@ -1,22 +1,8 @@
 import NextAuth from "next-auth";
 import Google from "next-auth/providers/google";
-import Credentials from "next-auth/providers/credentials";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
     providers: [
-        Credentials({
-            id: "credentials",
-            name: "Mock Account",
-            credentials: {},
-            authorize: async () => {
-                return {
-                    id: "test-user-id",
-                    name: "Test User",
-                    email: "test@example.com",
-                    image: "https://github.com/shadcn.png"
-                }
-            }
-        }),
         Google({
             authorization: {
                 params: {

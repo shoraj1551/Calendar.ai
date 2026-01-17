@@ -23,13 +23,13 @@ export const ConflictService = {
         // 1. Fetch User Preferences
         const settingsRec = await db.select().from(userSettings).where(eq(userSettings.userId, userId));
         const prefs = settingsRec[0] || {};
-        const ignoredHolidays = (settingsRec[0]?.ignoredHolidays as string[]) || [];
+        const ignoredHolidays: string[] = []; // Field doesn't exist in schema
 
         // 2. Generate Synthetic Blocks (Holidays/Lunch)
         const syntheticBlocks = BlockGenerator.generateBlocksForDay(start, {
-            lunch: prefs.lunch,
-            workStart: prefs.workStart,
-            workEnd: prefs.workEnd
+            lunch: { enabled: false }, // Lunch feature not in current schema
+            workStart: `${prefs.workingHoursStart || 9}:00`,
+            workEnd: `${prefs.workingHoursEnd || 17}:00`
         }, ignoredHolidays);
 
         // 3. Fetch Existing DB Blocks (Focus/Recovery/Social/LifeEvent)

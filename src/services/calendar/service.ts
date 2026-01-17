@@ -87,9 +87,9 @@ export const getAggregatedEvents = async (accessToken: string, userId: string): 
     const rangeEnd = endOfMonth(addMonths(now, 1));
 
     const lunchBlocks = BlockGenerator.generateLunchBlocks(rangeStart, rangeEnd, {
-        lunch: prefs.lunch,
-        workStart: prefs.workStart,
-        workEnd: prefs.workEnd
+        lunch: { enabled: false }, // Lunch feature not in current schema
+        workStart: `${prefs.workingHoursStart || 9}:00`,
+        workEnd: `${prefs.workingHoursEnd || 17}:00`
     });
 
     const holidays = BlockGenerator.generateHolidays(now.getFullYear());

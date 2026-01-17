@@ -109,6 +109,10 @@ export const userSettings = pgTable("user_settings", {
     browserNotifications: boolean("browser_notifications").default(true).notNull(),
     reminderMinutes: integer("reminder_minutes").default(15).notNull(),
 
+    // Schedule analysis preferences
+    lunchBreakEnabled: boolean("lunch_break_enabled").default(true).notNull(),
+    ignoredHolidays: jsonb("ignored_holidays").default([]),
+
     // Other preferences
     timezone: text("timezone").default("UTC").notNull(),
 

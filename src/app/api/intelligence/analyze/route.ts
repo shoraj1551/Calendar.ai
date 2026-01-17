@@ -29,9 +29,9 @@ export async function POST(req: Request) {
         const prefs = settingsRecord[0] || {};
 
         const analysisSettings = {
-            workStart: prefs.workStart || "09:00",
-            workEnd: prefs.workEnd || "17:00",
-            lunch: prefs.lunch !== false
+            workStart: prefs.workingHoursStart ? `${String(prefs.workingHoursStart).padStart(2, '0')}:00` : "09:00",
+            workEnd: prefs.workingHoursEnd ? `${String(prefs.workingHoursEnd).padStart(2, '0')}:00` : "17:00",
+            lunch: prefs.lunchBreakEnabled ?? true
         };
 
         // 3. Analyze
