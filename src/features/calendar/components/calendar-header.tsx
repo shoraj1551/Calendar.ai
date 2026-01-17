@@ -1,7 +1,9 @@
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Shield } from "lucide-react";
 import { format } from "date-fns";
 import { PermissionControl } from "@/components/permission-control";
+import { shieldUpAction } from "@/app/actions/calendar";
+import { toast } from "sonner";
 
 export type CalendarViewType = "month" | "week" | "day";
 
@@ -15,6 +17,23 @@ interface CalendarHeaderProps {
 }
 
 export function CalendarHeader({ currentDate, view, onViewChange, onPrev, onNext, onToday }: CalendarHeaderProps) {
+
+    const handleShieldUp = async () => {
+        toast.loading("Finding your best focus slot...");
+        try {
+            const res = await shieldUpAction(currentDate);
+            if (res.success) {
+                toast.success(res.message);
+            } else {
+                toast.error(res.error || res.message);
+            }
+        } catch (e) {
+            toast.error("Failed to shield up.");
+        } finally {
+            toast.dismiss(); // dismiss loading
+        }
+    };
+
     return (
         <div className="flex items-center justify-between border-b px-6 py-4">
             <div className="flex items-center gap-4">
@@ -34,6 +53,10 @@ export function CalendarHeader({ currentDate, view, onViewChange, onPrev, onNext
                 </div>
             </div>
             <div className="flex items-center gap-4">
+                <Button variant="default" className="gap-2 bg-indigo-600 hover:bg-indigo-700 text-white" onClick={handleShieldUp}>
+                    <Shield className="h-4 w-4" />
+                    Shield Up
+                </Button>
                 <PermissionControl />
                 <div className="flex items-center gap-2 border rounded-md p-1">
                     <Button

@@ -18,7 +18,8 @@ const run = async () => {
     const diwaliEnd = new Date("2025-10-20T11:00:00");
 
     console.log(`\n📅 Test 1: Booking on Hard Block (Diwali 2025)`);
-    // Ensure ignored list is empty
+    // Ensure ignored list is empty (and row exists)
+    await db.insert(userSettings).values({ userId, ignoredHolidays: [] }).onConflictDoNothing();
     await db.update(userSettings).set({ ignoredHolidays: [] }).where(eq(userSettings.userId, userId));
 
     const check1 = await ConflictService.validateEventTime(userId, diwaliDate, diwaliEnd, false);

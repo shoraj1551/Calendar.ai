@@ -1,8 +1,22 @@
 import NextAuth from "next-auth";
 import Google from "next-auth/providers/google";
+import Credentials from "next-auth/providers/credentials";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
     providers: [
+        Credentials({
+            id: "credentials",
+            name: "Mock Account",
+            credentials: {},
+            authorize: async () => {
+                return {
+                    id: "test-user-id",
+                    name: "Test User",
+                    email: "test@example.com",
+                    image: "https://github.com/shadcn.png"
+                }
+            }
+        }),
         Google({
             authorization: {
                 params: {
@@ -15,23 +29,34 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         }),
     ],
     callbacks: {
-        async jwt({ token, account }) {
+        async jwt({ token, account, user }) {
             // Persist the OAuth access_token and refresh_token to the token right after signin
             if (account) {
                 token.accessToken = account.access_token;
                 token.refreshToken = account.refresh_token;
                 token.expiresAt = account.expires_at;
             }
+            // Add user ID to token
+            if (user) {
+                token.id = user.id;
+            }
             return token;
         },
         async session({ session, token }) {
             // Send properties to the client, like an access_token and user id from a provider.
-            // Note: We don't expose the sensitive refresh token to the client.
-            //   session.accessToken = token.accessToken;
+            if (token.id) {
+                session.user.id = token.id as string;
+            }
+            if (token.accessToken) {
+                session.accessToken = token.accessToken as string;
+            }
             return session;
         },
     },
     // pages: {
     //   signIn: "/auth/signin", // Custom sign-in page if needed, otherwise default
     // },
+    session: {
+        strategy: "jwt",
+    },
 });

@@ -1,4 +1,5 @@
-import { pgTable, text, timestamp, uuid, boolean, integer, index, jsonb } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, uuid, boolean, integer, index, jsonb, real } from "drizzle-orm/pg-core";
+import { sql } from "drizzle-orm";
 
 export const users = pgTable("users", {
     id: uuid("id").defaultRandom().primaryKey(),
@@ -41,13 +42,95 @@ export const tasks = pgTable("tasks", {
     userId: uuid("user_id").references(() => users.id).notNull(),
     title: text("title").notNull(),
     description: text("description"),
-    status: text("status", { enum: ["todo", "in_progress", "done"] }).default("todo").notNull(),
+    status: text("status", { enum: ["todo", "in_progress", "done", "scheduled"] }).default("todo").notNull(),
     priority: text("priority", { enum: ["low", "medium", "high"] }).default("medium").notNull(),
     dueDate: timestamp("due_date"),
+    estimatedDuration: integer("estimated_duration").default(30), // minutes for timeblocking
+    allocatedEventId: text("allocated_event_id"), // links to calendar event when scheduled
     source: text("source", { enum: ["manual", "ai", "meeting"] }).default("manual").notNull(),
     sourceId: text("source_id"),
     completedAt: timestamp("completed_at"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// Meeting Notes
+export const meetingNotes = pgTable("meeting_notes", {
+    id: uuid("id").defaultRandom().primaryKey(),
+    eventId: uuid("event_id").references(() => events.id, { onDelete: 'cascade' }).notNull(),
+    userId: uuid("user_id").references(() => users.id).notNull(),
+
+    // Content
+    rawNotes: text("raw_notes").notNull(),
+    summary: text("summary"),
+    keyPoints: text("key_points").array(),
+    decisions: text("decisions").array(),
+
+    // Metadata
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+// Action Items extracted from meetings
+export const actionItems = pgTable("action_items", {
+    id: uuid("id").defaultRandom().primaryKey(),
+    meetingNoteId: uuid("meeting_note_id").references(() => meetingNotes.id, { onDelete: 'cascade' }).notNull(),
+    taskId: uuid("task_id").references(() => tasks.id),
+
+    // Content
+    description: text("description").notNull(),
+    assignee: text("assignee"),
+    dueDate: timestamp("due_date"),
+    priority: text("priority", { enum: ["low", "medium", "high"] }).default("medium").notNull(),
+    status: text("status", { enum: ["pending", "in_progress", "completed", "cancelled"] }).default("pending").notNull(),
+
+    // AI metadata
+    confidence: real("confidence"),
+    extractedFrom: text("extracted_from"),
+
+    // Timestamps
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    completedAt: timestamp("completed_at"),
+});
+
+// User Settings
+export const userSettings = pgTable("user_settings", {
+    id: uuid("id").defaultRandom().primaryKey(),
+    userId: uuid("user_id").references(() => users.id).notNull().unique(),
+
+    // Calendar preferences
+    defaultView: text("default_view", { enum: ["day", "week", "month"] }).default("week").notNull(),
+    workingHoursStart: integer("working_hours_start").default(9).notNull(),
+    workingHoursEnd: integer("working_hours_end").default(17).notNull(),
+    showWeekends: boolean("show_weekends").default(true).notNull(),
+    firstDayOfWeek: integer("first_day_of_week").default(0).notNull(), // 0 = Sunday
+
+    // Notification preferences
+    emailNotifications: boolean("email_notifications").default(true).notNull(),
+    browserNotifications: boolean("browser_notifications").default(true).notNull(),
+    reminderMinutes: integer("reminder_minutes").default(15).notNull(),
+
+    // Other preferences
+    timezone: text("timezone").default("UTC").notNull(),
+
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+// User Energy Zones
+export const userEnergyZones = pgTable("user_energy_zones", {
+    id: uuid("id").defaultRandom().primaryKey(),
+    userId: uuid("user_id").references(() => users.id).notNull(),
+
+    // Time range (24-hour format)
+    startHour: integer("start_hour").notNull(), // 0-23
+    endHour: integer("end_hour").notNull(), // 0-23
+
+    // Energy level
+    energyLevel: text("energy_level", { enum: ["high", "medium", "low"] }).notNull(),
+
+    // Metadata
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
 export const meetings = pgTable("meetings", {
@@ -103,12 +186,6 @@ export const notifications = pgTable("notifications", {
     };
 });
 
-export const userSettings = pgTable("user_settings", {
-    userId: uuid("user_id").references(() => users.id).primaryKey(),
-    preferences: jsonb("preferences").notNull().default({}),
-    ignoredHolidays: jsonb("ignored_holidays").default([]), // List of holiday IDs to ignore
-    updatedAt: timestamp("updated_at").defaultNow().notNull(),
-});
 export const connectedAccounts = pgTable("connected_accounts", {
     id: uuid("id").defaultRandom().primaryKey(),
     userId: uuid("user_id").references(() => users.id).notNull(),
@@ -121,7 +198,7 @@ export const connectedAccounts = pgTable("connected_accounts", {
     refreshToken: text("refresh_token"),
     expiresAt: timestamp("expires_at"),
     preferences: jsonb("preferences").notNull().default({}),
-    ignoredHolidays: jsonb("ignored_holidays").default([]), // List of holiday IDs to ignore
+    ignoredHolidays: jsonb("ignored_holidays").default([]),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
 }, (table) => {
@@ -130,16 +207,3 @@ export const connectedAccounts = pgTable("connected_accounts", {
     };
 });
 
-export const userEnergyZones = pgTable("user_energy_zones", {
-    id: uuid("id").defaultRandom().primaryKey(),
-    userId: uuid("user_id").references(() => users.id).notNull(),
-    dayOfWeek: text("day_of_week").notNull(), // "monday", ... "all"
-    startTime: text("start_time").notNull(), // "09:00"
-    endTime: text("end_time").notNull(), // "11:00"
-    energyLevel: text("energy_level", { enum: ["high", "medium", "low", "drain"] }).default("medium").notNull(),
-    createdAt: timestamp("created_at").defaultNow().notNull(),
-}, (table) => {
-    return {
-        userIdIdx: index("energy_zones_user_id_idx").on(table.userId),
-    };
-});

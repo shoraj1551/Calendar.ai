@@ -92,6 +92,20 @@
       "when": 1766402570214,
       "tag": "0012_long_shockwave",
       "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1768596271655,
+      "tag": "0013_outgoing_excalibur",
+      "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1768625739570,
+      "tag": "0014_unknown_white_tiger",
+      "breakpoints": true
     }
   ]
 }

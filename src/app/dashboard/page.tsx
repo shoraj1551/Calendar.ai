@@ -12,6 +12,7 @@ import { ContextPrompts } from "@/features/intelligence/components/context-promp
 import { MagicInput } from "@/features/dashboard/components/magic-input";
 import { ReviewWizard } from "@/features/reviews/components/review-wizard";
 import { AutomationSettings } from "@/features/settings/automation-settings";
+import { FocusSuggestions } from "@/features/focus/components/focus-suggestions";
 
 export default async function DashboardPage() {
     const session = await auth();
@@ -83,6 +84,7 @@ export default async function DashboardPage() {
                     <div className="flex justify-end">
                         <QuickActions />
                     </div>
+                    <FocusSuggestions />
                     <SuggestionsWidget />
                     <AccountabilityWidget />
                 </div>

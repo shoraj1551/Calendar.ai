@@ -8,17 +8,13 @@ const connectionString = process.env.DATABASE_URL || "postgres://postgres:admin@
 // We will simply use the connection string as is for now, but adding logging.
 console.log(`[DB] Connecting...`);
 
-let finalConnectionString = connectionString;
-if (connectionString.includes("pg-3ee00806-calendarai-d621.k.aivencloud.com")) {
-    console.log("[DB] Applying DNS Patch: Swapping hostname for known IP (64.227.191.215)");
-    finalConnectionString = connectionString.replace("pg-3ee00806-calendarai-d621.k.aivencloud.com", "64.227.191.215");
-}
+// Connection string is used directly. DNS resolution is handled by the driver.
+const finalConnectionString = connectionString;
 
 export const client = postgres(finalConnectionString, {
     prepare: false,
-    // Add strict timeout to fail fast if stuck
     connect_timeout: 10,
     onnotice: () => { },
-    ssl: { rejectUnauthorized: false } // Required when using IP directly often
+    ssl: finalConnectionString.includes("localhost") ? false : { rejectUnauthorized: false } // Disable SSL for local
 });
 export const db = drizzle(client, { schema });

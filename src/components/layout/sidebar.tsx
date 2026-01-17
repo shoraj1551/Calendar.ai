@@ -1,15 +1,14 @@
 "use client";
 
-import { Calendar, LayoutDashboard, Settings, Mic, Activity } from "lucide-react";
+import { Calendar, LayoutDashboard, Settings, Activity } from "lucide-react";
 import { LogoutButton } from "@/components/home/auth-buttons";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 
-const NAV_ITEMS = [
+const navItems = [
     { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard" },
     { icon: Calendar, label: "Calendar", href: "/calendar" },
-    { icon: Mic, label: "Meeting Mode", href: "/meetings" },
     { icon: Activity, label: "Analytics", href: "/analytics" },
     { icon: Settings, label: "Settings", href: "/settings" },
 ];
@@ -24,7 +23,7 @@ export function Sidebar({ className }: { className?: string }) {
             </div>
 
             <nav className="flex-1 px-4 py-6 space-y-1">
-                {NAV_ITEMS.map((item) => {
+                {navItems.map((item) => {
                     const isActive = pathname === item.href;
                     return (
                         <Link

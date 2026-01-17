@@ -7,8 +7,9 @@ declare module "next-auth" {
     interface Session {
         accessToken?: string;
         user: {
-            /** The user's postal address. */
-            address: string;
+            id: string;
+            address?: string;
         } & DefaultSession["user"];
     }
 }
+

@@ -86,7 +86,60 @@ export class GoogleCalendarProvider implements CalendarProvider {
     }
 
     // Stubs for now
-    async createEvent(event: Partial<NormalizedEvent>): Promise<NormalizedEvent> { throw new Error("Not implemented"); }
-    async updateEvent(id: string, event: Partial<NormalizedEvent>): Promise<NormalizedEvent> { throw new Error("Not implemented"); }
-    async deleteEvent(id: string): Promise<void> { throw new Error("Not implemented"); }
+    async createEvent(event: Partial<NormalizedEvent>): Promise<NormalizedEvent> {
+        const calendar = google.calendar({ version: 'v3', auth: this.oAuth2Client });
+
+        const requestBody: calendar_v3.Schema$Event = {
+            summary: event.title || "New Event",
+            description: event.description,
+            start: { dateTime: event.startTime?.toISOString() },
+            end: { dateTime: event.endTime?.toISOString() }
+        };
+
+        try {
+            const res = await calendar.events.insert({
+                calendarId: 'primary',
+                requestBody
+            });
+
+            return this.normalizeEvent(res.data);
+        } catch (error) {
+            console.error("Google Create Event Error:", error);
+            throw error;
+        }
+    }
+    async updateEvent(id: string, event: Partial<NormalizedEvent>): Promise<NormalizedEvent> {
+        const calendar = google.calendar({ version: 'v3', auth: this.oAuth2Client });
+
+        const patchBody: calendar_v3.Schema$Event = {};
+        if (event.title) patchBody.summary = event.title;
+        if (event.description) patchBody.description = event.description;
+        if (event.startTime) patchBody.start = { dateTime: event.startTime.toISOString() };
+        if (event.endTime) patchBody.end = { dateTime: event.endTime.toISOString() };
+
+        try {
+            const res = await calendar.events.patch({
+                calendarId: 'primary',
+                eventId: id, // This is the Google ID (providerEventId)
+                requestBody: patchBody
+            });
+
+            return this.normalizeEvent(res.data);
+        } catch (error) {
+            console.error("Google Update Event Error:", error);
+            throw error;
+        }
+    }
+    async deleteEvent(id: string): Promise<void> {
+        const calendar = google.calendar({ version: 'v3', auth: this.oAuth2Client });
+        try {
+            await calendar.events.delete({
+                calendarId: 'primary',
+                eventId: id
+            });
+        } catch (error) {
+            console.error("Google Delete Event Error:", error);
+            throw error;
+        }
+    }
 }
