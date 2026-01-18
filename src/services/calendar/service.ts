@@ -96,7 +96,7 @@ export const getAggregatedEvents = async (accessToken: string, userId: string): 
     const rangeEnd = endOfMonth(addMonths(now, 1));
 
     const lunchBlocks = BlockGenerator.generateLunchBlocks(rangeStart, rangeEnd, {
-        lunch: { enabled: false }, // Lunch feature not in current schema
+        lunch: false, // Lunch feature disabled for now
         workStart: `${prefs.workingHoursStart || 9}:00`,
         workEnd: `${prefs.workingHoursEnd || 17}:00`
     });

@@ -27,7 +27,7 @@ export const ConflictService = {
 
         // 2. Generate Synthetic Blocks (Holidays/Lunch)
         const syntheticBlocks = BlockGenerator.generateBlocksForDay(start, {
-            lunch: { enabled: false }, // Lunch feature not in current schema
+            lunch: false, // Lunch feature disabled for now
             workStart: `${prefs.workingHoursStart || 9}:00`,
             workEnd: `${prefs.workingHoursEnd || 17}:00`
         }, ignoredHolidays);

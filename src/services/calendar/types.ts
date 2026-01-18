@@ -6,7 +6,7 @@ export interface UnifiedEvent {
     allDay?: boolean;
     provider?: "local" | "google" | "outlook";
     status?: "confirmed" | "tentative" | "cancelled";
-    type?: "work" | "personal" | "break" | "lunch" | "holiday";
+    type?: "work" | "personal" | "break" | "lunch" | "holiday" | "focus" | "block" | "recovery" | "social" | "life_event" | "admin";
     isUrgent?: boolean; // Override flag for soft blocks
     description?: string;
     location?: string;

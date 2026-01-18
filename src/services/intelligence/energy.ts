@@ -11,10 +11,10 @@ export const EnergyService = {
      */
     async seedDefaultZones(userId: string) {
         const defaultZones = [
-            { dayOfWeek: "all", startTime: "09:00", endTime: "11:30", energyLevel: "high" }, // Deep Work
-            { dayOfWeek: "all", startTime: "13:00", endTime: "14:00", energyLevel: "drain" }, // Post-Lunch Dip
-            { dayOfWeek: "all", startTime: "14:00", endTime: "16:00", energyLevel: "medium" }, // Collab
-            { dayOfWeek: "all", startTime: "16:00", endTime: "17:00", energyLevel: "low" },   // Wrap up
+            { startHour: 9, endHour: 11, energyLevel: "high" }, // Deep Work (9-11am)
+            { startHour: 13, endHour: 14, energyLevel: "drain" }, // Post-Lunch Dip
+            { startHour: 14, endHour: 16, energyLevel: "medium" }, // Collab
+            { startHour: 16, endHour: 17, energyLevel: "low" },   // Wrap up
         ];
 
         const values = defaultZones.map(z => ({ ...z, userId, energyLevel: z.energyLevel as EnergyLevel }));
@@ -32,13 +32,7 @@ export const EnergyService = {
     async getEnergyLevel(userId: string, date: Date): Promise<EnergyLevel> {
         // 1. Fetch zones
         const zones = await db.select().from(userEnergyZones).where(
-            and(
-                eq(userEnergyZones.userId, userId),
-                or(
-                    eq(userEnergyZones.dayOfWeek, "all"),
-                    eq(userEnergyZones.dayOfWeek, date.toLocaleDateString("en-US", { weekday: "long" }).toLowerCase())
-                )
-            )
+            eq(userEnergyZones.userId, userId)
         );
 
         if (zones.length === 0) return "medium"; // Default
@@ -52,11 +46,8 @@ export const EnergyService = {
         // 2. Find matching zone
         // Simple linear scan. If multiple match, last one wins (or "High" wins? let's stick to simple first match for now)
         for (const zone of zones) {
-            const [startH, startM] = zone.startTime.split(":").map(Number);
-            const [endH, endM] = zone.endTime.split(":").map(Number);
-
-            const startVal = startH * 60 + startM;
-            const endVal = endH * 60 + endM;
+            const startVal = zone.startHour * 60; // Convert hour to minutes
+            const endVal = zone.endHour * 60;
 
             if (timeVal >= startVal && timeVal < endVal) {
                 currentLevel = zone.energyLevel as EnergyLevel;
