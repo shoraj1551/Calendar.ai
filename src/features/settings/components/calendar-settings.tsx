@@ -14,7 +14,13 @@ import { toast } from 'sonner';
 export function CalendarSettings() {
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
-    const [settings, setSettings] = useState({
+    const [settings, setSettings] = useState<{
+        defaultView: "day" | "week" | "month";
+        workingHoursStart: number;
+        workingHoursEnd: number;
+        showWeekends: boolean;
+        firstDayOfWeek: number;
+    }>({
         defaultView: 'week',
         workingHoursStart: 9,
         workingHoursEnd: 17,
