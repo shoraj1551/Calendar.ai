@@ -1,0 +1,1 @@
+ALTER TABLE "user_settings" ADD COLUMN "ignored_holidays" jsonb DEFAULT '[]'::jsonb;

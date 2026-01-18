@@ -1,7 +1,7 @@
 
 import { db } from "@/db";
 import { tasks, userSettings } from "@/db/schema";
-import { eq, and, lte, isNull } from "drizzle-orm";
+import { eq, and, lte } from "drizzle-orm";
 import { CommunicationService } from "../communications/service";
 
 export class AccountabilityService {
@@ -29,7 +29,7 @@ export class AccountabilityService {
             )
         );
         // Clean filter for non-done in JS if needed or strict query
-        const activeOverdue = overdueTasks.filter(t => t.status !== 'done');
+        const activeOverdue = overdueTasks.filter((t: typeof tasks.$inferSelect) => t.status !== 'done');
 
         if (activeOverdue.length === 0) {
             return { sent: false, reason: "no_overdue" };

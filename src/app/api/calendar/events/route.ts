@@ -83,8 +83,8 @@ export async function PATCH(req: Request) {
             // For now, assuming full update or frontend sends both. 
             // Better Robustness: Fetch existing event if one date is missing.
 
-            let start = data.start ? new Date(data.start) : null;
-            let end = data.end ? new Date(data.end) : null;
+            const start = data.start ? new Date(data.start) : null;
+            const end = data.end ? new Date(data.end) : null;
 
             if (start && end) { // Only check if we have a complete range
                 const userId = await EventRepository.ensureUser(session.user.email); // Re-resolving ID slightly inefficient but safe

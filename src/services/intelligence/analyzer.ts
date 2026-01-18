@@ -1,6 +1,6 @@
 import { UnifiedEvent } from "../calendar/types";
 import { DayMetrics } from "./types";
-import { startOfDay, differenceInMinutes, isSameDay, eachDayOfInterval } from "date-fns";
+import { differenceInMinutes, isSameDay, eachDayOfInterval } from "date-fns";
 
 // Define Settings Interface locally to avoid circular deps, or import if available
 interface AnalysisSettings {

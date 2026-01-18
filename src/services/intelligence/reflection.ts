@@ -1,7 +1,6 @@
 
 import { UnifiedEvent } from "../calendar/types";
-import { DayMetrics } from "./types";
-import { format, differenceInMinutes, isSameDay, startOfWeek, endOfWeek, eachDayOfInterval, isWeekend } from "date-fns";
+import { differenceInMinutes, isSameDay, endOfWeek, eachDayOfInterval, isWeekend } from "date-fns";
 
 export interface ReflectionInsight {
     type: "praise" | "nudge" | "alert";
@@ -21,6 +20,19 @@ export interface DailyReflection {
     insights: ReflectionInsight[];
 }
 
+export interface WeeklySummary {
+    period: {
+        start: Date;
+        end: Date;
+    };
+    totals: {
+        meetings: number;
+        focus: number;
+        avgDailyMeetings: string;
+    };
+    primaryInsight: string;
+}
+
 export const ReflectionService = {
     /**
      * Analyzes a single day and generates a reflection.
@@ -30,7 +42,7 @@ export const ReflectionService = {
 
         let totalMeetingMins = 0;
         let focusMins = 0; // Simplified for now: assume gaps > 60m are focus
-        let gaps: number[] = [];
+        const gaps: number[] = [];
         let lunchTaken = false;
 
         // Sort events
@@ -42,7 +54,6 @@ export const ReflectionService = {
             totalMeetingMins += dur;
 
             // Simple Lunch Check
-            const startH = e.start.getHours();
             if (e.type === 'lunch' || (e.title.toLowerCase().includes("lunch"))) {
                 lunchTaken = true;
             }
@@ -134,7 +145,7 @@ export const ReflectionService = {
     /**
      * Generates a weekly summary.
      */
-    analyzeWeek(weekStart: Date, events: UnifiedEvent[]): any { // Simplified return type for now
+    analyzeWeek(weekStart: Date, events: UnifiedEvent[]): WeeklySummary {
         const days = eachDayOfInterval({ start: weekStart, end: endOfWeek(weekStart) });
         const reflections = days.map(d => this.analyzeDay(d, events));
 

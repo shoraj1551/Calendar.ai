@@ -3,9 +3,26 @@ import { db } from "@/db";
 import { userSettings, users } from "@/db/schema";
 import { eq } from "drizzle-orm";
 
+interface EmailMessage {
+    to: string;
+    subject: string;
+    body: string;
+    timestamp: Date;
+}
+
+interface PushMessage {
+    userId: string;
+    title: string;
+    body: string;
+    timestamp: Date;
+}
+
+type UserSettingsRow = typeof userSettings.$inferSelect;
+type CommunicationSettings = Partial<UserSettingsRow> & Record<string, unknown>;
+
 // Mock Transports (In a real app, these would wrap Nodemailer / FCM)
 export const MockEmailTransport = {
-    sent: [] as any[],
+    sent: [] as EmailMessage[],
     send: (to: string, subject: string, body: string) => {
         console.log(`[Email Sent] To: ${to}, Subject: ${subject}`);
         MockEmailTransport.sent.push({ to, subject, body, timestamp: new Date() });
@@ -15,7 +32,7 @@ export const MockEmailTransport = {
 };
 
 export const MockPushTransport = {
-    sent: [] as any[],
+    sent: [] as PushMessage[],
     send: (userId: string, title: string, body: string) => {
         console.log(`[Push Sent] User: ${userId}, Title: ${title}`);
         MockPushTransport.sent.push({ userId, title, body, timestamp: new Date() });
@@ -27,7 +44,7 @@ export const MockPushTransport = {
 export class CommunicationService {
 
     // Helper: Get Settings
-    private static async getSettings(userId: string) {
+    private static async getSettings(userId: string): Promise<CommunicationSettings> {
         const settings = await db.select().from(userSettings).where(eq(userSettings.userId, userId));
         // Return default if not set, mirroring frontend defaults
         return settings[0] || {
@@ -53,7 +70,7 @@ export class CommunicationService {
         return notificationType === 'alarm';
     }
 
-    private static inQuietHours(settings: any): boolean {
+    private static inQuietHours(settings: CommunicationSettings): boolean {
         if (!settings.quietHours) return false;
 
         const now = new Date();
@@ -78,7 +95,7 @@ export class CommunicationService {
     // --- Core Actions ---
 
     static async sendDailySummary(userId: string) {
-        const settings: any = await this.getSettings(userId);
+        const settings = await this.getSettings(userId);
         const email = await this.getUserEmail(userId);
 
         if (!settings.dailySummary) {
@@ -94,7 +111,7 @@ export class CommunicationService {
     }
 
     static async sendWeeklyInsights(userId: string) {
-        const settings: any = await this.getSettings(userId);
+        const settings = await this.getSettings(userId);
         const email = await this.getUserEmail(userId);
 
         if (!settings.weeklyInsights) {
@@ -108,7 +125,7 @@ export class CommunicationService {
     }
 
     static async dispatchNotification(userId: string, type: 'alarm' | 'nudge' | 'info', title: string, message: string) {
-        const settings: any = await this.getSettings(userId);
+        const settings = await this.getSettings(userId);
         const email = await this.getUserEmail(userId);
 
         // 1. Check Urgent Only Mode

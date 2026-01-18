@@ -1,6 +1,6 @@
 import { db } from "@/db";
 import { tasks } from "@/db/schema";
-import { eq, and, isNotNull } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 
 export const TaskMetrics = {
     async getAccountabilityScore(userId: string) {

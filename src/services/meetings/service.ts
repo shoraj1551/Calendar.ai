@@ -1,12 +1,15 @@
 
 import { db } from "@/db";
-import { meetings, tasks, userSettings, users } from "@/db/schema";
+import { meetings, tasks, userSettings } from "@/db/schema";
 import { eq } from "drizzle-orm";
+
+type UserSettingsRow = typeof userSettings.$inferSelect;
+type PartialSettings = Partial<UserSettingsRow> & Record<string, unknown>;
 
 export class MeetingService {
 
     // Helper: Get Settings
-    private static async getSettings(userId: string) {
+    private static async getSettings(userId: string): Promise<PartialSettings> {
         const settings = await db.select().from(userSettings).where(eq(userSettings.userId, userId));
         return settings[0] || {};
     }
@@ -16,7 +19,7 @@ export class MeetingService {
      * In a real app, this would be called by the bot prior to joining a Zoom/Meet call.
      */
     static async shouldBotJoin(userId: string, meetingTitle: string): Promise<{ join: boolean; reason?: string }> {
-        const settings: any = await this.getSettings(userId);
+        const settings = await this.getSettings(userId);
 
         // 1. Check Master Toggle
         if (settings.autoJoin === false) {
@@ -38,7 +41,7 @@ export class MeetingService {
      * Processes a transcript and saves it, respecting privacy settings.
      */
     static async processMeeting(userId: string, title: string, transcript: string) {
-        const settings: any = await this.getSettings(userId);
+        const settings = await this.getSettings(userId);
 
         // 1. Check Recording/Processing Permissions
         if (settings.recordAll === false) {

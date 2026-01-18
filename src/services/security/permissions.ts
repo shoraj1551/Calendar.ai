@@ -3,7 +3,7 @@ export type PermissionScope = "READ_CALENDAR" | "WRITE_CALENDAR" | "RECORD_MEETI
 // Mock permissions stored in DB (users table could have 'permissions' jsonb column)
 // For MVP, we assume all users grant basic permissions, but we enforce the CHECK.
 export const PermissionService = {
-    async check(userId: string, scope: PermissionScope): Promise<boolean> {
+    async check(_userId: string, _scope: PermissionScope): Promise<boolean> {
         // In a real app: const user = await db.query.users.findFirst(...)
         // return user.permissions.includes(scope)
 

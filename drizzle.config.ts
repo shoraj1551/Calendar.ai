@@ -3,7 +3,7 @@ import * as dotenv from "dotenv";
 
 dotenv.config({ path: ".env" });
 
-let connectionString = process.env.DATABASE_URL!;
+const connectionString = process.env.DATABASE_URL!;
 // Temporarily disabled DNS patch - using proper hostname for Aiven connection
 // if (connectionString && connectionString.includes("pg-3ee00806-calendarai-d621.k.aivencloud.com")) {
 //     console.log("Applying DNS Patch to Connection String...");

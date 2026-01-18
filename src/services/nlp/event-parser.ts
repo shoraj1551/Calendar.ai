@@ -170,7 +170,7 @@ Output: {"title":"Coffee","date":"2026-01-24","startTime":"09:00","durationMinut
             const endTime = new Date(startTime.getTime() + durationMinutes * 60000);
 
             // Extract title (remove date/time keywords)
-            let title = input
+            const title = input
                 .replace(patterns.tomorrow, '')
                 .replace(patterns.today, '')
                 .replace(patterns.nextWeek, '')

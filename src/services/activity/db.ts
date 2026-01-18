@@ -3,7 +3,7 @@ import { activityLogs, focusSessions } from "@/db/schema";
 import { eq, and, desc, gte, lte } from "drizzle-orm";
 
 export const ActivityRepository = {
-    async logHeartbeat(userId: string, metadata?: any) {
+    async logHeartbeat(userId: string, metadata?: Record<string, unknown>) {
         await db.insert(activityLogs).values({
             userId,
             type: "heartbeat",

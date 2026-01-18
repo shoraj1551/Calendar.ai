@@ -1,7 +1,7 @@
 
 import { db } from "@/db";
 import { userEnergyZones } from "@/db/schema";
-import { eq, and, or } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 
 export type EnergyLevel = "high" | "medium" | "low" | "drain";
 

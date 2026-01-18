@@ -113,6 +113,19 @@ export const userSettings = pgTable("user_settings", {
     lunchBreakEnabled: boolean("lunch_break_enabled").default(true).notNull(),
     ignoredHolidays: jsonb("ignored_holidays").default([]),
 
+    // Communication preferences
+    dailySummary: boolean("daily_summary").default(true).notNull(),
+    weeklyInsights: boolean("weekly_insights").default(true).notNull(),
+    urgentOnly: boolean("urgent_only").default(false).notNull(),
+    commChannel: text("comm_channel", { enum: ["email", "push", "in-app"] }).default("email").notNull(),
+    quietHours: boolean("quiet_hours").default(true).notNull(),
+    quietStart: text("quiet_start").default("22:00").notNull(),
+    quietEnd: text("quiet_end").default("08:00").notNull(),
+
+    // Accountability preferences
+    accountabilityMode: text("accountability_mode", { enum: ["gentle", "strict"] }).default("gentle").notNull(),
+    enableCheckins: boolean("enable_checkins").default(true).notNull(),
+
     // Other preferences
     timezone: text("timezone").default("UTC").notNull(),
 
@@ -130,7 +143,7 @@ export const userEnergyZones = pgTable("user_energy_zones", {
     endHour: integer("end_hour").notNull(), // 0-23
 
     // Energy level
-    energyLevel: text("energy_level", { enum: ["high", "medium", "low"] }).notNull(),
+    energyLevel: text("energy_level", { enum: ["high", "medium", "low", "drain"] }).notNull(),
 
     // Metadata
     createdAt: timestamp("created_at").defaultNow().notNull(),
