@@ -28,6 +28,15 @@ const normalizeGoogleEvent = (event: any): UnifiedEvent => {
         description: event.description,
         location: event.location,
         meetLink: event.htmlLink,
+        attendees: event.attendees?.map((a: any) => ({
+            email: a.email,
+            displayName: a.displayName,
+            responseStatus: a.responseStatus
+        })),
+        organizer: event.organizer ? {
+            email: event.organizer.email,
+            displayName: event.organizer.displayName
+        } : undefined
     };
 };
 

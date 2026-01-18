@@ -13,6 +13,15 @@ export interface UnifiedEvent {
     meetLink?: string; // e.g., Google Meet URL
     connectedAccountId?: string | null;  // Added for calendar account tracking
     providerEventId?: string | null;     // Added for provider event ID
+    attendees?: Array<{
+        email: string;
+        displayName?: string;
+        responseStatus?: "accepted" | "declined" | "tentative" | "needsAction";
+    }>;
+    organizer?: {
+        email: string;
+        displayName?: string;
+    };
 }
 
 export interface CalendarSource {
