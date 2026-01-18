@@ -90,7 +90,7 @@ export function CalendarSettings() {
                     <Label htmlFor="defaultView">Default Calendar View</Label>
                     <Select
                         value={settings.defaultView}
-                        onValueChange={(value) => setSettings({ ...settings, defaultView: value })}
+                        onValueChange={(value) => setSettings({ ...settings, defaultView: value as "day" | "week" | "month" })}
                     >
                         <SelectTrigger id="defaultView">
                             <SelectValue />

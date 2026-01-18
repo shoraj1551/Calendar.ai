@@ -66,7 +66,8 @@ export class AnalyticsService {
         unifiedEvents.forEach(e => {
             const minutes = differenceInMinutes(e.end, e.start);
             const hours = minutes / 60;
-            byCategory[e.type] = (byCategory[e.type] || 0) + hours;
+            const type = e.type || 'personal'; // Default type if undefined
+            byCategory[type] = (byCategory[type] || 0) + hours;
         });
 
         // Calculate meeting load
@@ -105,7 +106,7 @@ export class AnalyticsService {
             byCategory,
             meetingLoad,
             focusBlocks,
-            averageMeetingDuration,
+            averageMeetingDuration: avgMeetingDuration,
             dailyBreakdown
         };
     }
